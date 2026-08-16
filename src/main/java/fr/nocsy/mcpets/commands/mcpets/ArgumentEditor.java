@@ -2,14 +2,15 @@ package fr.nocsy.mcpets.commands.mcpets;
 
 import fr.nocsy.mcpets.PPermission;
 import fr.nocsy.mcpets.commands.AArgument;
-import fr.nocsy.mcpets.data.editor.Editor;
+import fr.nocsy.mcpets.data.menus.MenuContext;
+import fr.nocsy.mcpets.data.menus.MenuService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ArgumentEditor extends AArgument {
 
     public ArgumentEditor(CommandSender sender, String[] args) {
-        super("editor", new int[]{1}, sender, args);
+        super("editor", new int[]{1}, sender, args, "/mcpets editor");
     }
 
     @Override
@@ -19,8 +20,12 @@ public class ArgumentEditor extends AArgument {
 
     @Override
     public void commandEffect() {
-        Player p = (Player) sender;
-        Editor editor = Editor.getEditor(p);
-        editor.openEditor();
+        final Player p = (Player) sender;
+        // Prefer YAML-driven global editor menu when available
+        if (MenuService.getInstance().get("global") != null) {
+            MenuService.getInstance().open("global", MenuContext.of(p));
+        } else {
+            fr.nocsy.mcpets.data.editor.Editor.getEditor(p).openEditor();
+        }
     }
 }

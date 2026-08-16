@@ -2,22 +2,19 @@ package fr.nocsy.mcpets.utils;
 
 import fr.nocsy.mcpets.MCPets;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 import java.util.HashMap;
 
 public class PetTimer {
 
     @Getter
-    private static HashMap<PetTimer, Integer> runningTimers = new HashMap<>();
+    private static HashMap<PetTimer, Object> runningTimers = new HashMap<>();
 
     @Getter
     private int cooldown;
     @Getter
     private int remainingTime;
     private long frequency;
-
-    private int task;
 
     private final Runnable endingRunnable;
 
@@ -33,11 +30,11 @@ public class PetTimer {
     }
 
     public void launch(Runnable runnable) {
-        // If it's running then cancel the current scheduler
         if (isRunning())
             stop(null);
         remainingTime = cooldown;
-        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(MCPets.getInstance(), () -> {
+
+        Runnable taskLogic = () -> {
             if (cooldown != Integer.MAX_VALUE)
                 remainingTime--;
             if (remainingTime <= 0)
@@ -45,12 +42,15 @@ public class PetTimer {
 
             if (runnable != null)
                 runnable.run();
-        }, 0L, frequency);
+        };
+
+        Object task = FoliaCompat.runGlobalTimer(taskLogic, 1L, Math.max(1L, frequency));
         runningTimers.put(this, task);
     }
 
     public void stop(Runnable runnable) {
-        Bukkit.getScheduler().cancelTask(task);
+        Object task = runningTimers.get(this);
+        FoliaCompat.cancel(task);
         runningTimers.remove(this);
         remainingTime = 0;
         if (runnable != null)

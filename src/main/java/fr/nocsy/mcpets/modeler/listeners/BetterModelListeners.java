@@ -1,6 +1,7 @@
 package fr.nocsy.mcpets.modeler.listeners;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.PPermission;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.PetDespawnReason;
@@ -116,7 +117,7 @@ public class BetterModelListeners {
             return;
         }
 
-        Bukkit.getScheduler().runTask(MCPets.getInstance(), () -> {
+        FoliaCompat.runGlobal(() -> {
             Pet pet = Pet.getFromEntity(mountEntity);
             if (pet != null && pet.isDespawnOnDismount()) {
                 pet.despawn(PetDespawnReason.DISMOUNT);

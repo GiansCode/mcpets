@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.utils.PetMath;
 import fr.nocsy.mcpets.data.livingpets.PetFoodBuff;
@@ -65,9 +66,7 @@ public class PetBuffMechanic extends SkillMechanic implements ITargetedEntitySki
         PetFoodType buffType = PetFoodType.get(type);
         PetMath mathOperator = PetMath.get(operator);
 
-        Bukkit.getScheduler().runTask(
-                MCPets.getInstance(),
-                () -> {
+        FoliaCompat.runGlobal(() -> {
                     PetFoodBuff buff = new PetFoodBuff(pet, buffType, powerValue, mathOperator, durationValue);
                     buff.apply();
                 }

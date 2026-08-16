@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.utils.PetMath;
 import fr.nocsy.mcpets.utils.debug.Debugger;
@@ -70,7 +71,7 @@ public class PetFoodBuff {
 
         PetFoodBuff instance = this;
 
-        Bukkit.getScheduler().runTaskLater(MCPets.getInstance(), instance::stop, duration);
+        FoliaCompat.runGlobalLater(instance::stop, duration);
     }
 
     public void stop() {

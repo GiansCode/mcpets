@@ -1,6 +1,7 @@
 package fr.nocsy.mcpets.data.inventories;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.config.FormatArg;
 import fr.nocsy.mcpets.data.config.GlobalConfig;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -148,18 +148,11 @@ public class PetInventory {
      * and add the tracing metadata
      */
     public void open(Player p) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                p.openInventory(inventory);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        p.setMetadata("MCPets;petInventory", new FixedMetadataValue(MCPets.getInstance(), pet.getId()));
-                    }
-                }.runTaskLater(MCPets.getInstance(), 2L);
-            }
-        }.runTaskLater(MCPets.getInstance(), 2L);
+        FoliaCompat.runEntityLater(p, () -> {
+            p.openInventory(inventory);
+            FoliaCompat.runEntityLater(p, () ->
+                    p.setMetadata("MCPets;petInventory", new FixedMetadataValue(MCPets.getInstance(), pet.getId())), 2L);
+        }, 2L);
     }
 
     /**
@@ -168,15 +161,12 @@ public class PetInventory {
      */
     public void close(Player p) {
         p.setMetadata("MCPets;petInventory", new FixedMetadataValue(MCPets.getInstance(), null));
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!GlobalConfig.getInstance().isDatabaseSupport())
-                    PlayerDataNoDatabase.get(p.getUniqueId()).save();
-                else
-                    PlayerData.saveDB();
-            }
-        }.runTaskAsynchronously(MCPets.getInstance());
+        FoliaCompat.runAsync(() -> {
+            if (!GlobalConfig.getInstance().isDatabaseSupport())
+                PlayerDataNoDatabase.get(p.getUniqueId()).save();
+            else
+                PlayerData.saveDB();
+        });
     }
 
     /**

@@ -8,12 +8,13 @@ import org.bukkit.entity.Player;
 
 import fr.nocsy.mcpets.MCPets;
 import fr.nocsy.mcpets.data.Pet;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.config.Language;
 import fr.nocsy.mcpets.data.PetDespawnReason;
 
 public class DespawnPetFlag extends AbstractFlag implements StoppableFlag {
 
-    int task;
+    private Object task;
 
     public static String NAME = "mcpets-despawn";
 
@@ -35,7 +36,7 @@ public class DespawnPetFlag extends AbstractFlag implements StoppableFlag {
 
         MCPets.getLog().info("Starting flag " + getFlagName() + ".");
 
-        task = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(getMCPetsInstance(), () -> {
+        task = FoliaCompat.runGlobalTimer(() -> {
             if (MCPets.getMythicMobs() == null) return;
 
             Player pl;
@@ -51,12 +52,13 @@ public class DespawnPetFlag extends AbstractFlag implements StoppableFlag {
 
                 Language.CANT_FOLLOW_HERE.sendMessage(pl);
             }
-        }, 0L, 20L);
+        }, 1L, 20L);
     }
 
     @Override
     public void stop() {
-        Bukkit.getServer().getScheduler().cancelTask(task);
+        FoliaCompat.cancel(task);
+        task = null;
     }
 
 }

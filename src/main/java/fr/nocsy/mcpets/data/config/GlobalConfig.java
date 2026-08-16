@@ -32,6 +32,8 @@ public class GlobalConfig extends AbstractConfig {
     @Getter
     private boolean mountable;
     @Getter
+    private boolean showNameTag;
+    @Getter
     private boolean rightClickToOpen;
     @Getter
     private boolean leftClickToOpen;
@@ -136,9 +138,9 @@ public class GlobalConfig extends AbstractConfig {
         super.init("", "config.yml");
 
         if (getConfig().get("Prefix") == null)
-            getConfig().set("Prefix", "§8[§6MCPets§8] » ");
+            getConfig().set("Prefix", "<dark_gray>[<gold>MCPets</gold>]</dark_gray> <gray>»</gray> ");
         if (getConfig().get("DefaultName") == null)
-            getConfig().set("DefaultName", "§9Pet of %player%");
+            getConfig().set("DefaultName", "<blue>Pet of %player%</blue>");
         if (getConfig().get("OverrideDefaultName") == null)
             getConfig().set("OverrideDefaultName", true);
         if (getConfig().get("EnableClickBackToMenu") == null)
@@ -163,6 +165,8 @@ public class GlobalConfig extends AbstractConfig {
             getConfig().set("Nameable", true);
         if (getConfig().get("Mountable") == null)
             getConfig().set("Mountable", true);
+        if (getConfig().get("ShowNameTag") == null)
+            getConfig().set("ShowNameTag", true);
         if (getConfig().get("DistanceTeleport") == null)
             getConfig().set("DistanceTeleport", 30);
         if (getConfig().get("MaxNameLength") == null)
@@ -187,9 +191,9 @@ public class GlobalConfig extends AbstractConfig {
         if (getConfig().get("Experience.Symbol") == null)
             getConfig().set("Experience.Symbol", "|");
         if (getConfig().get("Experience.ColorDone") == null)
-            getConfig().set("Experience.ColorDone", "§a");
+            getConfig().set("Experience.ColorDone", "<green>");
         if (getConfig().get("Experience.ColorLeft") == null)
-            getConfig().set("Experience.ColorLeft", "§f");
+            getConfig().set("Experience.ColorLeft", "<white>");
 
         if (getConfig().get("Taming.AnnouncementType") == null)
             getConfig().set("Taming.AnnouncementType", PetAnnouncement.CHAT.name());
@@ -198,9 +202,9 @@ public class GlobalConfig extends AbstractConfig {
         if (getConfig().get("Taming.Symbol") == null)
             getConfig().set("Taming.Symbol", "|");
         if (getConfig().get("Taming.ColorDone") == null)
-            getConfig().set("Taming.ColorDone", "§a");
+            getConfig().set("Taming.ColorDone", "<green>");
         if (getConfig().get("Taming.ColorLeft") == null)
-            getConfig().set("Taming.ColorLeft", "§f");
+            getConfig().set("Taming.ColorLeft", "<white>");
 
         if (getConfig().get("MySQL.Prefix") == null)
             getConfig().set("MySQL.Prefix", "");
@@ -257,10 +261,16 @@ public class GlobalConfig extends AbstractConfig {
         sneakMode = getConfig().getBoolean("SneakMode");
         nameable = getConfig().getBoolean("Nameable");
         mountable = getConfig().getBoolean("Mountable");
+        showNameTag = getConfig().getBoolean("ShowNameTag");
         dismountOnDamaged = getConfig().getBoolean("DismountOnDamaged");
+        dismountOnDamagedExcludePlayers = getConfig().getBoolean("DismountOnDamagedExcludePlayers");
         spawnPetOnReconnect = getConfig().getBoolean("SpawnPetOnReconnect");
         distanceTeleport = getConfig().getInt("DistanceTeleport");
         maxNameLength = getConfig().getInt("MaxNameLength");
+        // Legacy typo key used by older editor builds
+        if (!getConfig().contains("MaxNameLength") && getConfig().contains("MaxNameLenght")) {
+            maxNameLength = getConfig().getInt("MaxNameLenght");
+        }
         enableClickBackToMenu = getConfig().getBoolean("EnableClickBackToMenu");
         activateBackMenuIcon = getConfig().getBoolean("ActivateBackMenuIcon");
         adaptiveInventory = getConfig().getInt("InventorySize");

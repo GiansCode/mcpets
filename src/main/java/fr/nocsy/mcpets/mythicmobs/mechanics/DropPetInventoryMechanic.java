@@ -6,6 +6,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.inventories.PetInventory;
 import fr.nocsy.mcpets.data.inventories.PetInventoryHolder;
@@ -42,7 +43,7 @@ public class DropPetInventoryMechanic extends SkillMechanic implements ITargeted
                 Inventory inv = petInventory.getInventory();
                 Location loc = BukkitAdapter.adapt(pet.getActiveMob().getLocation());
 
-                Bukkit.getScheduler().runTask(MCPets.getInstance(), () -> {
+                FoliaCompat.runGlobal(() -> {
                     for (ItemStack item : inv.getContents()) {
                         if (item == null) continue;
                         loc.getWorld().dropItemNaturally(loc, item);

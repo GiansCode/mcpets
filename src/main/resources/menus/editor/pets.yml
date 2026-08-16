@@ -1,0 +1,20 @@
+title: "<gold>Edit pets</gold>"
+type: CHEST
+rows: 6
+items:
+  back:
+    slot: 45
+    material: ARROW
+    name: "<red>Back</red>"
+    action: "EDITOR_NAVIGATE:GLOBAL_EDITOR"
+  create:
+    slot: 49
+    material: EMERALD
+    name: "<green>Create pet</green>"
+    action: "EDITOR_NAVIGATE:PET_EDITOR"
+  page:
+    slot: 53
+    material: PAPER
+    name: "<aqua>Page</aqua>"
+    action: NEXT_PAGE
+    pagination-next: true

@@ -1,0 +1,56 @@
+title: "%language_INVENTORY_MOUNTS_MENU_INTERACTIONS%"
+type: CHEST
+rows: 1
+items:
+  back:
+    slot: 0
+    material: PAPER
+    name: "%language_BACK_TO_PETMENU_ITEM_NAME%"
+    lore:
+      - "<gray>Return to mounts</gray>"
+    action: BACK_TO_MOUNT_MENU
+    condition: ACTIVATE_BACK_MENU_ICON
+  skins:
+    slot: 2
+    material: MAGMA_CREAM
+    name: "%language_SKINS_ITEM_NAME%"
+    lore:
+      - "%language_SKINS_ITEM_DESCRIPTION%"
+    action: OPEN_SKINS
+    condition: HAS_SKINS
+  rename:
+    slot: 3
+    material: NAME_TAG
+    name: "%language_RENAME_ITEM_NAME%"
+    lore:
+      - "%language_RENAME_ITEM_DESCRIPTION%"
+    action: RENAME
+    condition: NAMEABLE
+  info:
+    slot: 4
+    material: PLAYER_HEAD
+    name: "%pet_name%"
+    action: REVOKE
+    condition: TAMING_COMPLETE
+  mount:
+    slot: 5
+    material: SADDLE
+    name: "%language_MOUNT_ITEM_NAME%"
+    lore:
+      - "%language_MOUNT_ITEM_DESCRIPTION%"
+    action: MOUNT
+    condition: MOUNTABLE
+  signal:
+    slot: 6
+    material: STICK
+    name: "<white>Signal Stick</white>"
+    action: GIVE_SIGNAL_STICK
+    condition: HAS_SIGNALS
+  inventory:
+    slot: 7
+    material: CHEST
+    name: "%language_INVENTORY_ITEM_NAME%"
+    lore:
+      - "%language_INVENTORY_ITEM_DESCRIPTION%"
+    action: OPEN_INVENTORY
+    condition: HAS_PET_INVENTORY

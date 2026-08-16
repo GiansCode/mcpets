@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.utils.debug.Debugger;
 
@@ -49,9 +50,7 @@ public class EvolvePetMechanic extends SkillMechanic implements ITargetedEntityS
         Debugger.send("§7- evolution: §a" + evolutionId + " exists ? §a" + (evolution != null));
 
         if (evolution != null && pet != null && pet.getPetStats() != null) {
-            Bukkit.getScheduler().runTask(
-                    MCPets.getInstance(),
-                    () -> pet.getPetStats()
+            FoliaCompat.runGlobal(() -> pet.getPetStats()
                             .getCurrentLevel()
                             .evolveTo(pet.getOwner(), forceEvolution, evolution)
             );

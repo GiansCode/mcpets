@@ -58,13 +58,21 @@ public enum EditorItems {
     CONFIG_EDITOR_SNEAKMODE(CONFIG_EDITOR_SNEAKMODE(), "SneakMode", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_NAMEABLE(CONFIG_EDITOR_NAMEABLE(), "Nameable", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_MOUNTABLE(CONFIG_EDITOR_MOUNTABLE(), "Mountable", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_SHOW_NAME_TAG(CONFIG_EDITOR_SHOW_NAME_TAG(), "ShowNameTag", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_DISTANCE_TELEPORT(CONFIG_EDITOR_DISTANCE_TELEPORT(), "DistanceTeleport", "config", EditorExpectationType.FLOAT, null, true),
-    CONFIG_EDITOR_MAX_NAME_LENGTH(CONFIG_EDITOR_MAX_NAME_LENGTH(), "MaxNameLenght", "config", EditorExpectationType.INT, null, true),
+    CONFIG_EDITOR_MAX_NAME_LENGTH(CONFIG_EDITOR_MAX_NAME_LENGTH(), "MaxNameLength", "config", EditorExpectationType.INT, null, true),
     CONFIG_EDITOR_INVENTORY_SIZE(CONFIG_EDITOR_INVENTORY_SIZE(), "InventorySize", "config", EditorExpectationType.INT, null, true),
     CONFIG_EDITOR_ENABLE_CLICK_BACK_TO_MENU(CONFIG_EDITOR_ENABLE_CLICK_BACK_TO_MENU(), "EnableClickBackToMenu", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_ACTIVATE_BACK_MENU_ICON(CONFIG_EDITOR_ACTIVATE_BACK_MENU_ICON(), "ActivateBackMenuIcon", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_DISMOUNT_ON_DAMAGED(CONFIG_EDITOR_DISMOUNT_ON_DAMAGED(), "DismountOnDamaged", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_DISMOUNT_ON_DAMAGED_EXCLUDE_PLAYERS(CONFIG_EDITOR_DISMOUNT_ON_DAMAGED_EXCLUDE_PLAYERS(), "DismountOnDamagedExcludePlayers", "config", EditorExpectationType.BOOLEAN, null, true),
     CONFIG_EDITOR_DISABLE_INVENTORY_WHILE_SIGNAL_STICK(CONFIG_EDITOR_DISABLE_INVENTORY_WHILE_SIGNAL_STICK(), "DisableInventoryWhileHoldingSignalStick", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_SPAWN_PET_ON_RECONNECT(CONFIG_EDITOR_SPAWN_PET_ON_RECONNECT(), "SpawnPetOnReconnect", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_SPAWN_PET_AFTER_SERVER_RESTART(CONFIG_EDITOR_SPAWN_PET_AFTER_SERVER_RESTART(), "SpawnPetAfterServerRestart", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_FAST_MOUNT(CONFIG_EDITOR_FAST_MOUNT(), "FastMount", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_DISABLE_FAST_MOUNT_WHILE_SIGNAL_STICK(CONFIG_EDITOR_DISABLE_FAST_MOUNT_WHILE_SIGNAL_STICK(), "DisableFastMountWhileHoldingSignalStick", "config", EditorExpectationType.BOOLEAN, null, true),
+    CONFIG_EDITOR_MAX_ACTIVE_PETS(CONFIG_EDITOR_MAX_ACTIVE_PETS(), "MaxActivePets", "config", EditorExpectationType.INT, null, true),
+    CONFIG_EDITOR_MAX_ACTIVE_MOUNTS(CONFIG_EDITOR_MAX_ACTIVE_MOUNTS(), "MaxActiveMounts", "config", EditorExpectationType.INT, null, true),
     CONFIG_EDITOR_PERCENT_HEALTH_ON_RESPAWN(CONFIG_EDITOR_PERCENT_HEALTH_ON_RESPAWN(), "PercentHealthOnRespawn", "config", EditorExpectationType.FLOAT, null, true),
     CONFIG_EDITOR_AUTO_SAVE_DELAY(CONFIG_EDITOR_AUTO_SAVE_DELAY(), "AutoSaveDelay", "config", EditorExpectationType.INT, null, true),
     CONFIG_EDITOR_DEFAULT_RESPAWN_COOLDOWN(CONFIG_EDITOR_DEFAULT_RESPAWN_COOLDOWN(), "DefaultRespawnCooldown", "config", EditorExpectationType.INT, null, true),
@@ -84,6 +92,7 @@ public enum EditorItems {
     PET_EDITOR_MYTHICMOB(PET_EDITOR_MYTHICMOB(), "MythicMob", null, EditorExpectationType.MYTHICMOB, null, false),
     PET_EDITOR_PERMISSION(PET_EDITOR_PERMISSION(), "Permission", null, EditorExpectationType.STRING, null, true),
     PET_EDITOR_MOUNTABLE(PET_EDITOR_MOUNTABLE(), "Mountable", null, EditorExpectationType.BOOLEAN, null, true),
+    PET_EDITOR_SHOW_NAME_TAG(PET_EDITOR_SHOW_NAME_TAG(), "ShowNameTag", null, EditorExpectationType.BOOLEAN, null, true),
     PET_EDITOR_MOUNT_TYPE(PET_EDITOR_MOUNT_TYPE(), "MountType", null, EditorExpectationType.MOUNT_TYPE, null, true),
     PET_EDITOR_DESPAWN_ON_DISMOUNT(PET_EDITOR_DESPAWN_ON_DISMOUNT(), "DespawnOnDismount", null, EditorExpectationType.BOOLEAN, null, true),
     PET_EDITOR_AUTORIDE(PET_EDITOR_AUTORIDE(), "AutoRide", null, EditorExpectationType.BOOLEAN, null, true),
@@ -392,7 +401,7 @@ public enum EditorItems {
             newLores.add("§cSHIFT + click§7 to §creset§7 the value.");
         }
 
-        meta.setLore(newLores);
+        meta.lore(newLores.stream().map(Utils::toComponent).toList());
 
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
         meta.addItemFlags(ItemFlag.HIDE_PLACED_ON);
@@ -427,7 +436,7 @@ public enum EditorItems {
     private static ItemStack UNKNOWN() {
         final ItemStack it = new ItemStack(Material.BARRIER);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§cUnknown item");
+        meta.displayName(Utils.toComponent("§cUnknown item"));
         it.setItemMeta(meta);
         return it;
     }
@@ -435,7 +444,7 @@ public enum EditorItems {
     private static ItemStack FILLER() {
         final ItemStack it = new ItemStack(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§0");
+        meta.displayName(Utils.toComponent("§0"));
         it.setItemMeta(meta);
         return it;
     }
@@ -443,13 +452,13 @@ public enum EditorItems {
     private static ItemStack BACK_TO_ITEM(final String where) {
         final ItemStack it = new ItemStack(Material.PAPER);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§cBack to " + where);
+        meta.displayName(Utils.toComponent("§cBack to " + where));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to go back to the " + where + ".");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -460,13 +469,13 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR() {
         final ItemStack it = new ItemStack(Material.MOJANG_BANNER_PATTERN);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Edit configuration");
+        meta.displayName(Utils.toComponent("§6Edit configuration"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to edit the config options.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -474,13 +483,13 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR() {
         final ItemStack it = new ItemStack(Material.MAGMA_CUBE_SPAWN_EGG);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Edit pets");
+        meta.displayName(Utils.toComponent("§6Edit pets"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to edit/create pets.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -488,13 +497,13 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Edit categories");
+        meta.displayName(Utils.toComponent("§6Edit categories"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to edit/create categories.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -502,13 +511,13 @@ public enum EditorItems {
     private static ItemStack ITEM_EDITOR() {
         final ItemStack it = new ItemStack(Material.EMERALD);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Edit items");
+        meta.displayName(Utils.toComponent("§6Edit items"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to edit/add items.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -516,13 +525,13 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR() {
         final ItemStack it = new ItemStack(Material.COOKED_CHICKEN);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Edit pet food");
+        meta.displayName(Utils.toComponent("§6Edit pet food"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to edit/add pet food.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -533,15 +542,16 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_PREFIX() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Prefix");
+        meta.displayName(Utils.toComponent("<gold>Prefix</gold>"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
-        lores.add("§7Click to edit the plugin's prefix.");
+        lores.add("<gray>Click to edit the plugin's prefix.");
+        lores.add("<gray>Supports MiniMessage tags.");
         lores.add(" ");
-        lores.add("§7Current value: §e%value%");
+        lores.add("<gray>Current value: <yellow>%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -549,16 +559,17 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_DEFAULT_NAME() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Default pet name");
+        meta.displayName(Utils.toComponent("<gold>Default pet name</gold>"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
-        lores.add("§7Set the name of the pet when");
-        lores.add("§7none is set.");
+        lores.add("<gray>Set the name of the pet when");
+        lores.add("<gray>none is set.");
+        lores.add("<gray>Supports MiniMessage tags.");
         lores.add(" ");
-        lores.add("§7Current value: §e%value%");
+        lores.add("<gray>Current value: <yellow>%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -566,7 +577,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_USE_DEFAULT_MYTHICMOBS_NAMES() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Use default MythicMobs name");
+        meta.displayName(Utils.toComponent("§6Use default MythicMobs name"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -575,7 +586,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -583,7 +594,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_OVERRIDE_DEFAULT_NAME() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Override default name");
+        meta.displayName(Utils.toComponent("§6Override default name"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -592,7 +603,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -600,7 +611,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_RIGHT_CLICK_TO_OPEN_MENU() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Right click to open menu");
+        meta.displayName(Utils.toComponent("§6Right click to open menu"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -608,7 +619,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -616,7 +627,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_LEFT_CLICK_TO_OPEN_MENU() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Left click to open menu");
+        meta.displayName(Utils.toComponent("§6Left click to open menu"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -624,7 +635,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -632,7 +643,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_SNEAKMODE() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Sneak mode to open menu");
+        meta.displayName(Utils.toComponent("§6Sneak mode to open menu"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -641,7 +652,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -649,7 +660,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_NAMEABLE() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Nameable");
+        meta.displayName(Utils.toComponent("§6Nameable"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -657,7 +668,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -665,7 +676,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_MOUNTABLE() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Override default name");
+        meta.displayName(Utils.toComponent("§6Override default name"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -675,7 +686,25 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_SHOW_NAME_TAG() {
+        final ItemStack it = new ItemStack(Material.NAME_TAG);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Show Name Tag"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Whether MEG/BetterModel nametag bones");
+        lores.add("§7should be updated with the pet name.");
+        lores.add("§7Disable if another plugin handles nametags.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -683,7 +712,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_DISTANCE_TELEPORT() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Distance before teleport");
+        meta.displayName(Utils.toComponent("§6Distance before teleport"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -692,7 +721,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -700,7 +729,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_MAX_NAME_LENGTH() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Max name length");
+        meta.displayName(Utils.toComponent("§6Max name length"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -709,7 +738,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -717,7 +746,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_INVENTORY_SIZE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Summoning Inventory size");
+        meta.displayName(Utils.toComponent("§6Summoning Inventory size"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -726,7 +755,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -734,7 +763,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_ENABLE_CLICK_BACK_TO_MENU() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Enable click back to menu (category)");
+        meta.displayName(Utils.toComponent("§6Enable click back to menu (category)"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -743,7 +772,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -751,7 +780,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_ACTIVATE_BACK_MENU_ICON() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Activate back menu icon");
+        meta.displayName(Utils.toComponent("§6Activate back menu icon"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -760,7 +789,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -768,7 +797,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_DISMOUNT_ON_DAMAGED() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Dismount on damaged");
+        meta.displayName(Utils.toComponent("§6Dismount on damaged"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -777,7 +806,125 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_DISMOUNT_ON_DAMAGED_EXCLUDE_PLAYERS() {
+        final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Dismount on damaged (exclude players)"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7If enabled, player-vs-player damage");
+        lores.add("§7will not dismount the rider.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_SPAWN_PET_ON_RECONNECT() {
+        final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Spawn pet on reconnect"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Whether the last active pet should");
+        lores.add("§7respawn when the player reconnects.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_SPAWN_PET_AFTER_SERVER_RESTART() {
+        final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Spawn pet after server restart"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Whether pets should be restored");
+        lores.add("§7after a full server restart.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_FAST_MOUNT() {
+        final ItemStack it = new ItemStack(Material.SADDLE);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Fast mount"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Right-click a pet to mount instantly.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_DISABLE_FAST_MOUNT_WHILE_SIGNAL_STICK() {
+        final ItemStack it = new ItemStack(Material.STICK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Disable fast mount with signal stick"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Disable fast mount while holding");
+        lores.add("§7a signal stick.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_MAX_ACTIVE_PETS() {
+        final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Max active pets"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Maximum number of pets a player");
+        lores.add("§7can have spawned at once.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack CONFIG_EDITOR_MAX_ACTIVE_MOUNTS() {
+        final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Max active mounts"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Maximum number of mountable pets");
+        lores.add("§7a player can have spawned at once.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -785,7 +932,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_PERCENT_HEALTH_ON_RESPAWN() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Percent health on respawn");
+        meta.displayName(Utils.toComponent("§6Percent health on respawn"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -794,7 +941,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -802,7 +949,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_AUTO_SAVE_DELAY() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Auto-save database delay");
+        meta.displayName(Utils.toComponent("§6Auto-save database delay"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -811,7 +958,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -819,7 +966,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_DEFAULT_RESPAWN_COOLDOWN() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Default respawn cooldown");
+        meta.displayName(Utils.toComponent("§6Default respawn cooldown"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -828,7 +975,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -836,7 +983,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_GLOBAL_RESPAWN_COOLDOWN() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Global respawn cooldown");
+        meta.displayName(Utils.toComponent("§6Global respawn cooldown"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -845,7 +992,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -853,7 +1000,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_GLOBAL_AUTORESPAWN() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Autorespawn");
+        meta.displayName(Utils.toComponent("§6Autorespawn"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -862,7 +1009,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -870,7 +1017,7 @@ public enum EditorItems {
     private static ItemStack CONFIG_EDITOR_DISABLE_INVENTORY_WHILE_SIGNAL_STICK() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Disable inventory while signal stick");
+        meta.displayName(Utils.toComponent("§6Disable inventory while signal stick"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -879,7 +1026,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -904,7 +1051,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§eClick to edit that pet.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -932,7 +1079,7 @@ public enum EditorItems {
         lores.add("§eClick with an item on that icon");
         lores.add("§eto replace the pet icon.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -948,7 +1095,7 @@ public enum EditorItems {
         }
         final ItemMeta meta = it.getItemMeta();
         if (meta.getDisplayName().equals("§cUndefined"))
-            meta.setDisplayName("§6Signal stick");
+            meta.displayName(Utils.toComponent("§6Signal stick"));
 
         List<String> og_lores = it.getItemMeta().getLore();
         if (og_lores == null)
@@ -959,7 +1106,7 @@ public enum EditorItems {
         lores.add("§eClick with an item on that icon");
         lores.add("§eto replace the signal stick.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -970,14 +1117,14 @@ public enum EditorItems {
     private static ItemStack PAGE_SELECTOR() {
         final ItemStack it = new ItemStack(Material.ARROW);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§aPage selector");
+        meta.displayName(Utils.toComponent("§aPage selector"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§cLeft§7 click to go on the previous page");
         lores.add("§aRight§7 click to go on the next page");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -985,13 +1132,13 @@ public enum EditorItems {
     private static ItemStack CREATE_NEW_ITEM(final String what, final Material type) {
         final ItemStack it = new ItemStack(type);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§aCreate a new " + what);
+        meta.displayName(Utils.toComponent("§aCreate a new " + what));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Click to create a new " + what + ".");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -999,7 +1146,7 @@ public enum EditorItems {
     private static ItemStack DELETE(final String what) {
         final ItemStack it = new ItemStack(Material.BARRIER);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§cDelete the " + what);
+        meta.displayName(Utils.toComponent("§cDelete the " + what));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1007,7 +1154,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§c§lWARNING: this is permanent.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1015,7 +1162,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_MYTHICMOB() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6MythicMob");
+        meta.displayName(Utils.toComponent("§6MythicMob"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1023,7 +1170,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1031,7 +1178,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_PERMISSION() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Permission");
+        meta.displayName(Utils.toComponent("§6Permission"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1040,7 +1187,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1048,7 +1195,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_MOUNTABLE() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Mountable");
+        meta.displayName(Utils.toComponent("§6Mountable"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1058,7 +1205,24 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
+        it.setItemMeta(meta);
+        return it;
+    }
+
+    private static ItemStack PET_EDITOR_SHOW_NAME_TAG() {
+        final ItemStack it = new ItemStack(Material.NAME_TAG);
+        final ItemMeta meta = it.getItemMeta();
+        meta.displayName(Utils.toComponent("§6Show Name Tag"));
+
+        final ArrayList<String> lores = new ArrayList<>();
+        lores.add(" ");
+        lores.add("§7Override for MEG/BetterModel nametag bones.");
+        lores.add("§7Leave unset to use the global ShowNameTag.");
+        lores.add(" ");
+        lores.add("§7Current value: §e%value%");
+
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1066,7 +1230,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_MOUNT_TYPE() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Mount type");
+        meta.displayName(Utils.toComponent("§6Mount type"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1075,7 +1239,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1083,7 +1247,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_DESPAWN_ON_DISMOUNT() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Despawn on Dismount");
+        meta.displayName(Utils.toComponent("§6Despawn on Dismount"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1092,7 +1256,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1100,7 +1264,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_AUTORIDE() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Auto-ride");
+        meta.displayName(Utils.toComponent("§6Auto-ride"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1109,7 +1273,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1117,7 +1281,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_MOUNT_PERMISSION() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Mount permission");
+        meta.displayName(Utils.toComponent("§6Mount permission"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1126,7 +1290,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1134,7 +1298,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_DESPAWN_SKILL() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Despawn skill");
+        meta.displayName(Utils.toComponent("§6Despawn skill"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1142,7 +1306,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1150,7 +1314,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_DISTANCE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Come back distance");
+        meta.displayName(Utils.toComponent("§6Come back distance"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1159,7 +1323,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1167,7 +1331,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SPAWN_RANGE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Spawn range");
+        meta.displayName(Utils.toComponent("§6Spawn range"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1176,7 +1340,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1184,7 +1348,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_COMING_BACK_RANGE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Close up come back distance");
+        meta.displayName(Utils.toComponent("§6Close up come back distance"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1193,7 +1357,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1201,7 +1365,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_INVENTORY_SIZE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Inventory size");
+        meta.displayName(Utils.toComponent("§6Inventory size"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1209,7 +1373,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1217,7 +1381,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_TAMING_PROGRESS_SKILL() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Taming - Progress skill");
+        meta.displayName(Utils.toComponent("§6Taming - Progress skill"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1226,7 +1390,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1234,7 +1398,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_TAMING_FINISHED_SKILL() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Taming - Finished skill");
+        meta.displayName(Utils.toComponent("§6Taming - Finished skill"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1243,7 +1407,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1251,7 +1415,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_ICON() {
         final ItemStack it = new ItemStack(Material.END_CRYSTAL);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6MythicMob");
+        meta.displayName(Utils.toComponent("§6MythicMob"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1260,7 +1424,7 @@ public enum EditorItems {
         lores.add("§7Click it with an item from your inventory");
         lores.add("§7to modify the current item.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1268,7 +1432,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SIGNALS() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Signals");
+        meta.displayName(Utils.toComponent("§6Signals"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1277,7 +1441,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1285,7 +1449,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SIGNAL_STICK() {
         final ItemStack it = new ItemStack(Material.BLAZE_ROD);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Signal stick");
+        meta.displayName(Utils.toComponent("§6Signal stick"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1294,7 +1458,7 @@ public enum EditorItems {
         lores.add("§7Click it with an item from your inventory");
         lores.add("§7to modify the current item.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1302,7 +1466,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_GET_SIGNAL_STICK_FROM_MENU() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Signal stick from menu");
+        meta.displayName(Utils.toComponent("§6Signal stick from menu"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1311,7 +1475,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1319,13 +1483,13 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SKINS() {
         final ItemStack it = new ItemStack(Material.LEATHER);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Skins");
+        meta.displayName(Utils.toComponent("§6Skins"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Add/Delete skins for that pet.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1333,13 +1497,13 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVELS() {
         final ItemStack it = new ItemStack(Material.EXPERIENCE_BOTTLE);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Living pet features");
+        meta.displayName(Utils.toComponent("§6Living pet features"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Add/Edit living pet features.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1354,14 +1518,14 @@ public enum EditorItems {
         final ItemStack it = new ItemStack(Material.EXPERIENCE_BOTTLE);
         final ItemMeta meta = it.getItemMeta();
 
-        meta.setDisplayName("§a" + level.getLevelName());
+        meta.displayName(Utils.toComponent("§a" + level.getLevelName()));
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Experience threshold: §a" + level.getExpThreshold());
         lores.add(" ");
         lores.add("§eClick to edit that level.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1374,7 +1538,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_NAME() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Level name");
+        meta.displayName(Utils.toComponent("§6Level name"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1382,7 +1546,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1390,7 +1554,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_EXP_THRESHOLD() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Experience threshold");
+        meta.displayName(Utils.toComponent("§6Experience threshold"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1400,7 +1564,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1408,7 +1572,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_MAX_HEALTH() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Maximum health");
+        meta.displayName(Utils.toComponent("§6Maximum health"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1416,7 +1580,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1424,7 +1588,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_REGENERATION() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Regeneration");
+        meta.displayName(Utils.toComponent("§6Regeneration"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1433,7 +1597,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1441,7 +1605,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_RESISTANCE_MODIFIER() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Resistance modifier");
+        meta.displayName(Utils.toComponent("§6Resistance modifier"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1450,7 +1614,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1458,7 +1622,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_DAMAGE_MODIFIER() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Damage modifier");
+        meta.displayName(Utils.toComponent("§6Damage modifier"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1469,7 +1633,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1477,7 +1641,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_POWER() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Power modifier");
+        meta.displayName(Utils.toComponent("§6Power modifier"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1488,7 +1652,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1496,7 +1660,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_COOLDOWN_RESPAWN() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Cooldown - Respawn");
+        meta.displayName(Utils.toComponent("§6Cooldown - Respawn"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1505,7 +1669,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1513,7 +1677,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_COOLDOWN_REVOKE() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Cooldown - Revoke");
+        meta.displayName(Utils.toComponent("§6Cooldown - Revoke"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1522,7 +1686,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1530,7 +1694,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_INVENTORY_EXTENSION() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Inventory extension");
+        meta.displayName(Utils.toComponent("§6Inventory extension"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1539,7 +1703,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1547,7 +1711,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_ANNOUNCEMENT_TEXT() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Announcement - Text");
+        meta.displayName(Utils.toComponent("§6Announcement - Text"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1556,7 +1720,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1564,7 +1728,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_ANNOUNCEMENT_TYPE() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Announcement - Type");
+        meta.displayName(Utils.toComponent("§6Announcement - Type"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1572,7 +1736,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1580,7 +1744,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_ANNOUNCEMENT_SKILL() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Announcement - Skill");
+        meta.displayName(Utils.toComponent("§6Announcement - Skill"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1589,7 +1753,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1597,7 +1761,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_EVOLUTION_PET_ID() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Evolution - Pet ID");
+        meta.displayName(Utils.toComponent("§6Evolution - Pet ID"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1605,7 +1769,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1613,7 +1777,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_EVOLUTION_DELAY() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Evolution - Delay");
+        meta.displayName(Utils.toComponent("§6Evolution - Delay"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1622,7 +1786,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1630,7 +1794,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_LEVEL_EVOLUTION_REMOVE_ACCESS() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Evolution - Remove old access");
+        meta.displayName(Utils.toComponent("§6Evolution - Remove old access"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1639,7 +1803,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1658,12 +1822,12 @@ public enum EditorItems {
 
         final ItemMeta meta = it.getItemMeta();
 
-        meta.setDisplayName("§6Skin: §e" + skin.getMythicMobId());
+        meta.displayName(Utils.toComponent("§6Skin: §e" + skin.getMythicMobId()));
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§eClick to edit that skin.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
 
         it.setItemMeta(meta);
 
@@ -1685,13 +1849,13 @@ public enum EditorItems {
 
         final ItemMeta meta = it.getItemMeta();
 
-        meta.setDisplayName("§6Skin: §e" + skin.getMythicMobId());
+        meta.displayName(Utils.toComponent("§6Skin: §e" + skin.getMythicMobId()));
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§eClick with an item to edit");
         lores.add("§ethe icon of the skin.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1704,7 +1868,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SKIN_MYTHICMOB() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Skin - MythicMob");
+        meta.displayName(Utils.toComponent("§6Skin - MythicMob"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1712,7 +1876,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1720,7 +1884,7 @@ public enum EditorItems {
     private static ItemStack PET_EDITOR_SKIN_PERMISSION() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Skin - Permission");
+        meta.displayName(Utils.toComponent("§6Skin - Permission"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1729,7 +1893,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1746,12 +1910,12 @@ public enum EditorItems {
 
         final ItemMeta meta = it.getItemMeta();
 
-        meta.setDisplayName("§6Category: §e" + category.getIconName());
+        meta.displayName(Utils.toComponent("§6Category: §e" + category.getIconName()));
         final ArrayList<String> lores = new ArrayList<>();
 
         lores.add("§eClick to edit the category.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1770,7 +1934,7 @@ public enum EditorItems {
 
         final ItemMeta meta = it.getItemMeta();
 
-        meta.setDisplayName("§6Category: §e" + category.getIconName());
+        meta.displayName(Utils.toComponent("§6Category: §e" + category.getIconName()));
         final ArrayList<String> lores = new ArrayList<>();
 
         lores.add("§aExcluded categories:");
@@ -1797,7 +1961,7 @@ public enum EditorItems {
         lores.add("§eClick with an item to edit");
         lores.add("§ethe icon of the category.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1810,7 +1974,7 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_ID() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Category ID");
+        meta.displayName(Utils.toComponent("§6Category ID"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1818,7 +1982,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1826,7 +1990,7 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_DEFAULT_CATEGORY() {
         final ItemStack it = new ItemStack(Material.KNOWLEDGE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Default category");
+        meta.displayName(Utils.toComponent("§6Default category"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1835,7 +1999,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1844,7 +2008,7 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_EXCLUDED_CATEGORIES() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Excluded categories");
+        meta.displayName(Utils.toComponent("§6Excluded categories"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1853,7 +2017,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1861,13 +2025,13 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_PET_ADD() {
         final ItemStack it = new ItemStack(Material.GOLD_INGOT);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§aAdd§6 a pets");
+        meta.displayName(Utils.toComponent("§aAdd§6 a pets"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Add a pet to the category.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1875,13 +2039,13 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_PET_REMOVE() {
         final ItemStack it = new ItemStack(Material.NETHER_BRICK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§cRemove§6 a pet");
+        meta.displayName(Utils.toComponent("§cRemove§6 a pet"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
         lores.add("§7Remove a pet from the category.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1889,7 +2053,7 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_TITLE_NAME() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Category Inventory title");
+        meta.displayName(Utils.toComponent("§6Category Inventory title"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1898,7 +2062,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1906,7 +2070,7 @@ public enum EditorItems {
     private static ItemStack CATEGORY_EDITOR_CATEGORY_EDIT_ICON_NAME() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Category icon name");
+        meta.displayName(Utils.toComponent("§6Category icon name"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1915,7 +2079,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -1938,7 +2102,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§eClick to edit that item.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1965,7 +2129,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§eClick with an item to change it.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -1978,7 +2142,7 @@ public enum EditorItems {
     private static ItemStack ITEMS_EDIT_ID() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Item ID");
+        meta.displayName(Utils.toComponent("§6Item ID"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -1986,7 +2150,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2009,7 +2173,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§eClick to edit that petfood.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -2036,7 +2200,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§eClick with an item to change it.");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -2049,7 +2213,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_ID() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Petfood ID");
+        meta.displayName(Utils.toComponent("§6Petfood ID"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2057,7 +2221,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2068,7 +2232,7 @@ public enum EditorItems {
         if (petFood.getItemStack() != null)
             it = petFood.getItemStack().clone();
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Food item");
+        meta.displayName(Utils.toComponent("§6Food item"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2078,7 +2242,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
 
         this.item = it;
@@ -2088,7 +2252,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_TYPE() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Pet food type");
+        meta.displayName(Utils.toComponent("§6Pet food type"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2096,7 +2260,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2104,7 +2268,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_POWER() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Power value");
+        meta.displayName(Utils.toComponent("§6Power value"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2112,7 +2276,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2120,7 +2284,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_DURATION() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Duration of the buff");
+        meta.displayName(Utils.toComponent("§6Duration of the buff"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2129,7 +2293,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2137,7 +2301,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_OPERATOR() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Operator");
+        meta.displayName(Utils.toComponent("§6Operator"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2146,7 +2310,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2154,7 +2318,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_SIGNAL() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Signal");
+        meta.displayName(Utils.toComponent("§6Signal"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2163,7 +2327,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2171,7 +2335,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_PETS_ADD() {
         final ItemStack it = new ItemStack(Material.GOLD_INGOT);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§aAdd§6 pet");
+        meta.displayName(Utils.toComponent("§aAdd§6 pet"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2179,7 +2343,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Currently restricted pets: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2187,7 +2351,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_PETS_REMOVE() {
         final ItemStack it = new ItemStack(Material.NETHER_BRICK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§cRemove§6 pet");
+        meta.displayName(Utils.toComponent("§cRemove§6 pet"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2195,7 +2359,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Currently restricted pets: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2203,7 +2367,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_EVOLUTION() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Evolution");
+        meta.displayName(Utils.toComponent("§6Evolution"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2212,7 +2376,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2220,7 +2384,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_EXP_THRESHOLD() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Experience threshold");
+        meta.displayName(Utils.toComponent("§6Experience threshold"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2229,7 +2393,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2237,7 +2401,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_DELAY() {
         final ItemStack it = new ItemStack(Material.ENCHANTED_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Delay before evolution");
+        meta.displayName(Utils.toComponent("§6Delay before evolution"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2246,7 +2410,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2254,7 +2418,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_PERMISSION() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Permission");
+        meta.displayName(Utils.toComponent("§6Permission"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2262,7 +2426,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }
@@ -2270,7 +2434,7 @@ public enum EditorItems {
     private static ItemStack PETFOOD_EDITOR_EDIT_UNLOCKED_PET() {
         final ItemStack it = new ItemStack(Material.WRITABLE_BOOK);
         final ItemMeta meta = it.getItemMeta();
-        meta.setDisplayName("§6Unlocked pet");
+        meta.displayName(Utils.toComponent("§6Unlocked pet"));
 
         final ArrayList<String> lores = new ArrayList<>();
         lores.add(" ");
@@ -2279,7 +2443,7 @@ public enum EditorItems {
         lores.add(" ");
         lores.add("§7Current value: §e%value%");
 
-        meta.setLore(lores);
+        meta.lore(lores.stream().map(Utils::toComponent).toList());
         it.setItemMeta(meta);
         return it;
     }

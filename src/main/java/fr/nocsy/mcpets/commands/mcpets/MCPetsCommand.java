@@ -5,7 +5,7 @@ import fr.nocsy.mcpets.commands.AArgument;
 import fr.nocsy.mcpets.commands.CCommand;
 import fr.nocsy.mcpets.commands.tabcompleters.MCPetsCommandTabCompleter;
 import fr.nocsy.mcpets.data.config.Language;
-import fr.nocsy.mcpets.data.inventories.PetMenu;
+import fr.nocsy.mcpets.data.menus.MenuService;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -37,8 +37,7 @@ public class MCPetsCommand implements CCommand {
         if (sender.hasPermission(getPermission())) {
 
             if (sender instanceof Player && args.length == 0) {
-                PetMenu menu = new PetMenu((Player) sender, 0);
-                menu.open((Player) sender);
+                MenuService.getInstance().openPets((Player) sender);
                 return;
             }
 

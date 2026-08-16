@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 
 import io.lumine.mythic.bukkit.BukkitAdapter;
@@ -49,7 +50,7 @@ public class PetExperienceMechanic extends SkillMechanic implements ITargetedEnt
 
         final double expValue = experience.get(context);
 
-        Bukkit.getScheduler().runTask(MCPets.getInstance(), () -> pet.getPetStats().addExperience(expValue));
+        FoliaCompat.runGlobal(() -> pet.getPetStats().addExperience(expValue));
 
         return SkillResult.SUCCESS;
     }

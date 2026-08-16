@@ -1,78 +1,39 @@
 package fr.nocsy.mcpets.listeners;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-import fr.nocsy.mcpets.data.Pet;
-import fr.nocsy.mcpets.utils.PDCTag;
 import fr.nocsy.mcpets.data.Category;
 import fr.nocsy.mcpets.data.CategoryType;
 import fr.nocsy.mcpets.data.config.GlobalConfig;
-import fr.nocsy.mcpets.utils.MenuPaginationHelper;
-import fr.nocsy.mcpets.data.inventories.CategoriesMenu;
 import fr.nocsy.mcpets.data.inventories.PetInventoryHolder;
+import fr.nocsy.mcpets.data.menus.MenuService;
 
+/**
+ * Handles outside-click back navigation for category menus when still using holders.
+ * Primary navigation is Triumph YAML BACK actions.
+ */
 public class CategoryMenuListener implements Listener {
 
     @EventHandler
     public void click(final InventoryClickEvent e) {
-        if (Category.getCategories().isEmpty()) {
-            return;
-        }
-
-        if (!(e.getWhoClicked() instanceof final Player p)) {
-            return;
-        }
-
-        final Category category = Category.getCategoryView(p);
-
-        if (category == null) {
-            return;
-        }
-
         if (!(e.getInventory().getHolder() instanceof final PetInventoryHolder holder)) {
             return;
         }
-
         if (holder.getType() != PetInventoryHolder.Type.CATEGORY_MENU) {
             return;
         }
-
+        if (!(e.getWhoClicked() instanceof final Player p)) {
+            return;
+        }
         e.setCancelled(true);
-
         if (e.getClickedInventory() == null && GlobalConfig.getInstance().isEnableClickBackToMenu()) {
-            if (category.getCategoryType() == CategoryType.MOUNT) {
-                    CategoriesMenu.openFiltered(p, CategoryType.MOUNT);
-                } else {
-                    CategoriesMenu.open(p);
-                }
-            return;
-        }
-
-        final ItemStack it = e.getCurrentItem();
-        if (it == null || it.getType().isAir() || !it.hasItemMeta()) {
-            return;
-        }
-
-        String tag = PDCTag.get(it.getItemMeta());
-        if (tag != null) {
-            if (MenuPaginationHelper.handlePagination(it, p,
-                    "MCPetsPreviousPage;", "MCPetsNextPage;",
-                    category::openInventory)) {
-                return;
-            }
-        }
-
-        final Pet petObject = Pet.getFromIcon(it);
-        if (petObject != null) {
-            p.closeInventory();
-            final Pet pet = petObject.copy();
-            pet.spawnWithMessage(p);
+            final Category viewed = Category.getCategoryView(p);
+            final String filter = viewed != null && viewed.getCategoryType() == CategoryType.MOUNT ? "MOUNT" : "PET";
             Category.unregisterPlayerView(p);
+            MenuService.getInstance().openCategories(p, filter);
         }
     }
-
 }

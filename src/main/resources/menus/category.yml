@@ -1,0 +1,24 @@
+title: "%category_name%"
+type: PAGINATED
+rows: 6
+items:
+  back:
+    slot: 45
+    material: ARROW
+    name: "<white>Back</white>"
+    lore:
+      - "<gray>Return to categories</gray>"
+    action: BACK_TO_CATEGORIES
+    condition: ENABLE_CLICK_BACK_TO_MENU
+  previous:
+    slot: 48
+    material: PAPER
+    name: "%language_PREVIOUS_PAGE_ITEM_NAME%"
+    action: PREVIOUS_PAGE
+    pagination-previous: true
+  next:
+    slot: 50
+    material: PAPER
+    name: "%language_NEXT_PAGE_ITEM_NAME%"
+    action: NEXT_PAGE
+    pagination-next: true

@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.utils.Utils;
 import fr.nocsy.mcpets.data.sql.PlayerData;
@@ -259,7 +260,7 @@ public class PetLevel {
         }
 
         // Once permissions are applied, spawn the evolution on the main thread
-        permFuture.thenRun(() -> Bukkit.getScheduler().runTaskLater(MCPets.getInstance(), () -> {
+        permFuture.thenRun(() -> FoliaCompat.runGlobalLater(() -> {
             // Make sure the owner is still here
             final Player o = Bukkit.getPlayer(player);
             if (o != null) {

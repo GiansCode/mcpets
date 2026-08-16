@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.EventHandler;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.PPermission;
 import fr.nocsy.mcpets.utils.debug.Debugger;
@@ -34,7 +35,7 @@ public class ModelEngineListeners implements Listener {
 
         Entity entity = bukkitEntity.getOriginal();
 
-        Bukkit.getScheduler().runTask(MCPets.getInstance(), () -> {
+        FoliaCompat.runGlobal(() -> {
             Pet pet = Pet.getFromEntity(entity);
             if (pet != null && pet.isDespawnOnDismount()) {
                 pet.despawn(PetDespawnReason.DISMOUNT);

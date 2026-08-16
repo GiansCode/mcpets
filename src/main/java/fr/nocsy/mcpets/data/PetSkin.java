@@ -1,6 +1,8 @@
 package fr.nocsy.mcpets.data;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
+import fr.nocsy.mcpets.utils.Utils;
 import fr.nocsy.mcpets.utils.PDCTag;
 import fr.nocsy.mcpets.data.config.FormatArg;
 import fr.nocsy.mcpets.data.config.Language;
@@ -13,7 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,23 +106,7 @@ public class PetSkin {
         if (skins == null || skins.isEmpty())
             return false;
 
-        skins = skins.stream().filter(petSkin -> p.hasPermission(petSkin.getPermission())).toList();
-
-        int invSize = Math.min(skins.size(), 54);
-        while (invSize <= 0 || invSize % 9 != 0)
-            invSize++;
-
-        Inventory inventory = new PetInventoryHolder(invSize,
-                Language.PET_SKINS_TITLE.getMessageFormatted(
-                        new FormatArg("%pet%", pet.getIcon().getItemMeta().getDisplayName())),
-                PetInventoryHolder.Type.PET_SKINS_MENU).getInventory();
-
-        for (PetSkin petSkin : skins) {
-            inventory.addItem(petSkin.getIcon());
-        }
-
-        p.openInventory(inventory);
-        addMetada(p);
+        fr.nocsy.mcpets.data.menus.MenuService.getInstance().openSkins(p, pet);
         return true;
     }
 
@@ -173,7 +158,7 @@ public class PetSkin {
     private void initIcon() {
         icon = Items.UNKNOWN.getItem().clone();
         ItemMeta meta = icon.getItemMeta();
-        meta.setDisplayName("§6Skin §7: " + mythicMobId);
+        meta.displayName(Utils.toComponent("<gold>Skin</gold> <gray>:</gray> " + mythicMobId));
         ArrayList<String> lore = new ArrayList<>();
         lore.add("§7Click to apply that skin");
         meta.setLore(lore);
@@ -205,20 +190,13 @@ public class PetSkin {
 
         instancePet.despawn(PetDespawnReason.SKIN);
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                instancePet.spawn(loc, false);
-                if (hasRider) {
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            instancePet.setMount(Bukkit.getPlayer(instancePet.getOwner()));
-                        }
-                    }.runTaskLater(MCPets.getInstance(), 2L);
-                }
+        FoliaCompat.runLocationLater(loc, () -> {
+            instancePet.spawn(loc, false);
+            if (hasRider) {
+                FoliaCompat.runGlobalLater(() ->
+                        instancePet.setMount(Bukkit.getPlayer(instancePet.getOwner())), 2L);
             }
-        }.runTaskLater(MCPets.getInstance(), 2L);
+        }, 2L);
         return true;
     }
 }

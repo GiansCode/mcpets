@@ -1,5 +1,7 @@
 package fr.nocsy.mcpets;
 
+import fr.nocsy.mcpets.utils.FoliaCompat;
+
 import java.util.Map;
 import java.util.List;
 import java.util.UUID;
@@ -82,15 +84,16 @@ public class MCPets extends JavaPlugin {
         BlacklistConfig.getInstance().init();
         PetConfig.loadPets(AbstractConfig.getPath() + "Pets/", true);
         CategoryConfig.load(AbstractConfig.getPath() + "Categories/", true);
+        fr.nocsy.mcpets.data.menus.MenuService.getInstance().init();
 
         // Run DB initialization asynchronously to avoid freezing the main thread.
         // Tasks that depend on isDatabaseSupport() being correctly set (autosave scheduler,
         // Velocity init) must run AFTER this completes — see scheduleDbDependentTasks().
-        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+        FoliaCompat.runAsync(() -> {
             Databases.init();
             PlayerData.initAll();
             // Hop back to main thread for tasks that must schedule on the main scheduler
-            Bukkit.getScheduler().runTask(instance, MCPets::scheduleDbDependentTasks);
+            FoliaCompat.runGlobal(MCPets::scheduleDbDependentTasks);
         });
 
         for (final EditorItems item : EditorItems.values()) {
@@ -157,7 +160,7 @@ public class MCPets extends JavaPlugin {
         EventListener.init(this);
         modeler.registerListeners(this);
 
-        Bukkit.getScheduler().runTask(this, () -> {
+        FoliaCompat.runGlobal(() -> {
             loadConfigs();
             // PetStats.saveStats() and VelocitySyncManager.init() are scheduled inside
             // loadConfigs() once async DB init completes — see scheduleDbDependentTasks()

@@ -72,6 +72,12 @@ public enum EditorState {
     }
 
     public void openView(final Player p) {
+        // GLOBAL_EDITOR is driven by menus/editor/global.yml via Triumph
+        if (this == GLOBAL_EDITOR) {
+            fr.nocsy.mcpets.data.menus.MenuService.getInstance()
+                    .open("global", fr.nocsy.mcpets.data.menus.MenuContext.of(p));
+            return;
+        }
         this.buildInventory(p);
         p.openInventory(currentView);
     }
@@ -109,18 +115,26 @@ public enum EditorState {
             icons.put(EditorItems.CONFIG_EDITOR_SNEAKMODE, 24);
             icons.put(EditorItems.CONFIG_EDITOR_NAMEABLE, 25);
             icons.put(EditorItems.CONFIG_EDITOR_MOUNTABLE, 26);
-            icons.put(EditorItems.CONFIG_EDITOR_DISTANCE_TELEPORT, 27);
-            icons.put(EditorItems.CONFIG_EDITOR_MAX_NAME_LENGTH, 28);
-            icons.put(EditorItems.CONFIG_EDITOR_INVENTORY_SIZE, 29);
-            icons.put(EditorItems.CONFIG_EDITOR_ENABLE_CLICK_BACK_TO_MENU, 30);
-            icons.put(EditorItems.CONFIG_EDITOR_ACTIVATE_BACK_MENU_ICON, 31);
-            icons.put(EditorItems.CONFIG_EDITOR_DISMOUNT_ON_DAMAGED, 32);
-            icons.put(EditorItems.CONFIG_EDITOR_DISABLE_INVENTORY_WHILE_SIGNAL_STICK, 33);
-            icons.put(EditorItems.CONFIG_EDITOR_PERCENT_HEALTH_ON_RESPAWN, 34);
-            icons.put(EditorItems.CONFIG_EDITOR_AUTO_SAVE_DELAY, 35);
-            icons.put(EditorItems.CONFIG_EDITOR_DEFAULT_RESPAWN_COOLDOWN, 39);
-            icons.put(EditorItems.CONFIG_EDITOR_GLOBAL_RESPAWN_COOLDOWN, 40);
-            icons.put(EditorItems.CONFIG_EDITOR_GLOBAL_AUTORESPAWN, 41);
+            icons.put(EditorItems.CONFIG_EDITOR_SHOW_NAME_TAG, 27);
+            icons.put(EditorItems.CONFIG_EDITOR_DISTANCE_TELEPORT, 28);
+            icons.put(EditorItems.CONFIG_EDITOR_MAX_NAME_LENGTH, 29);
+            icons.put(EditorItems.CONFIG_EDITOR_INVENTORY_SIZE, 30);
+            icons.put(EditorItems.CONFIG_EDITOR_ENABLE_CLICK_BACK_TO_MENU, 31);
+            icons.put(EditorItems.CONFIG_EDITOR_ACTIVATE_BACK_MENU_ICON, 32);
+            icons.put(EditorItems.CONFIG_EDITOR_DISMOUNT_ON_DAMAGED, 33);
+            icons.put(EditorItems.CONFIG_EDITOR_DISMOUNT_ON_DAMAGED_EXCLUDE_PLAYERS, 34);
+            icons.put(EditorItems.CONFIG_EDITOR_DISABLE_INVENTORY_WHILE_SIGNAL_STICK, 35);
+            icons.put(EditorItems.CONFIG_EDITOR_SPAWN_PET_ON_RECONNECT, 36);
+            icons.put(EditorItems.CONFIG_EDITOR_SPAWN_PET_AFTER_SERVER_RESTART, 37);
+            icons.put(EditorItems.CONFIG_EDITOR_FAST_MOUNT, 38);
+            icons.put(EditorItems.CONFIG_EDITOR_DISABLE_FAST_MOUNT_WHILE_SIGNAL_STICK, 39);
+            icons.put(EditorItems.CONFIG_EDITOR_MAX_ACTIVE_PETS, 40);
+            icons.put(EditorItems.CONFIG_EDITOR_MAX_ACTIVE_MOUNTS, 41);
+            icons.put(EditorItems.CONFIG_EDITOR_PERCENT_HEALTH_ON_RESPAWN, 42);
+            icons.put(EditorItems.CONFIG_EDITOR_AUTO_SAVE_DELAY, 43);
+            icons.put(EditorItems.CONFIG_EDITOR_DEFAULT_RESPAWN_COOLDOWN, 44);
+            icons.put(EditorItems.CONFIG_EDITOR_GLOBAL_RESPAWN_COOLDOWN, 45);
+            icons.put(EditorItems.CONFIG_EDITOR_GLOBAL_AUTORESPAWN, 46);
 
             for(final EditorItems item : icons.keySet()) {
                 final int position = icons.get(item);
@@ -174,6 +188,7 @@ public enum EditorState {
             icons.put(EditorItems.PET_EDITOR_ICON.setFilePath(filePath).setupPetIconEdit(pet.getId()).getItem(), 13);
             icons.put(EditorItems.PET_EDITOR_PERMISSION.setFilePath(filePath).getItem(), 32);
             icons.put(EditorItems.PET_EDITOR_MOUNTABLE.setFilePath(filePath).getItem(), 27);
+            icons.put(EditorItems.PET_EDITOR_SHOW_NAME_TAG.setFilePath(filePath).getItem(), 26);
             icons.put(EditorItems.PET_EDITOR_MOUNT_TYPE.setFilePath(filePath).getItem(), 28);
             icons.put(EditorItems.PET_EDITOR_DESPAWN_ON_DISMOUNT.setFilePath(filePath).getItem(), 29);
             icons.put(EditorItems.PET_EDITOR_AUTORIDE.setFilePath(filePath).getItem(), 30);

@@ -1,6 +1,7 @@
 package fr.nocsy.mcpets.listeners;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.PetDespawnReason;
 import fr.nocsy.mcpets.data.config.FormatArg;
@@ -25,7 +26,6 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class LivingPetsListener implements Listener {
 
@@ -192,12 +192,7 @@ public class LivingPetsListener implements Listener {
 
         PetStats stats = pet.getPetStats();
         // Must run ASync otherwise it's not updating
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                stats.updateHealth();
-            }
-        }.runTaskLater(MCPets.getInstance(), 1L);
+        FoliaCompat.runGlobalLater(stats::updateHealth, 1L);
     }
 
     @EventHandler

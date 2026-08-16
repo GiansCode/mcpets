@@ -1,0 +1,16 @@
+title: "%language_CATEGORY_MENU_TITLE%"
+type: PAGINATED
+rows: 6
+items:
+  previous:
+    slot: 45
+    material: ARROW
+    name: "%language_PREVIOUS_PAGE_ITEM_NAME%"
+    action: PREVIOUS_PAGE
+    pagination-previous: true
+  next:
+    slot: 53
+    material: ARROW
+    name: "%language_NEXT_PAGE_ITEM_NAME%"
+    action: NEXT_PAGE
+    pagination-next: true

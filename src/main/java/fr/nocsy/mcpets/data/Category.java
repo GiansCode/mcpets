@@ -65,41 +65,11 @@ public class Category {
 
     public boolean openInventory(final Player p, final int page) {
         if (page >= maxPages || page < 0) return false;
-
-        p.closeInventory();
-
-        final List<Pet> playerPets = new ArrayList<>();
-        for (Pet pet : pets) {
-            if (!pet.has(p)) continue;
-            playerPets.add(pet);
-        }
-        
-        if (playerPets.isEmpty() && page > 0) return false;
-        
-        PaginationConfig config = MenuPaginationHelper.calculatePagination(page, playerPets.size());
-
-        final List<Pet> petsForPage = new ArrayList<>();
-        for (int i = config.startIndex(); i < config.startIndex() + config.itemsToShow() && i < playerPets.size(); i++) {
-            petsForPage.add(playerPets.get(i));
-        }
-        
-        final Inventory inventory = new PetInventoryHolder(config.invSize(), displayName, PetInventoryHolder.Type.CATEGORY_MENU).getInventory();
-
-        if (config.needsPreviousButton()) {
-            inventory.setItem(0, Items.previousPage(this, page));
-        }
-
-        if (config.needsNextButton()) {
-            inventory.setItem(config.invSize() - 1, Items.nextPage(this, page));
-        }
-
-        int slot = config.startSlot();
-        for (Pet pet : petsForPage) {
-            inventory.setItem(slot++, pet.buildItem(pet.getIcon(), true));
-        }
-
-        p.openInventory(inventory);
-        Category.registerPlayerView(p, this);
+        final fr.nocsy.mcpets.data.menus.MenuContext ctx = fr.nocsy.mcpets.data.menus.MenuContext.of(p)
+                .withCategory(this)
+                .withPage(page + 1)
+                .withFilter(categoryType != null ? categoryType.name() : "PET");
+        fr.nocsy.mcpets.data.menus.MenuService.getInstance().open("category", ctx);
         return true;
     }
 

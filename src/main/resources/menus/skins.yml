@@ -1,0 +1,11 @@
+title: "%language_PET_SKINS_TITLE%"
+type: CHEST
+rows: 6
+items:
+  back:
+    slot: 49
+    material: ARROW
+    name: "<white>Back</white>"
+    lore:
+      - "<gray>Return to pet menu</gray>"
+    action: BACK

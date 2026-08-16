@@ -1,0 +1,9 @@
+title: "<gold>Edit configuration</gold>"
+type: CHEST
+rows: 6
+items:
+  back:
+    slot: 0
+    material: ARROW
+    name: "<red>Back</red>"
+    action: "EDITOR_NAVIGATE:GLOBAL_EDITOR"

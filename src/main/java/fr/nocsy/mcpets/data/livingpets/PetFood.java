@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.Items;
 import fr.nocsy.mcpets.utils.Utils;
@@ -191,7 +192,7 @@ public class PetFood {
     public void registerWaitingList(UUID owner, long delay) {
         if (!waitingListApply.add(owner)) return;
 
-        Bukkit.getScheduler().runTaskLater(MCPets.getInstance(), () -> waitingListApply.remove(owner), delay);
+        FoliaCompat.runGlobalLater(() -> waitingListApply.remove(owner), delay);
     }
 
     private int getRemainingCooldownInSeconds(Pet pet) {

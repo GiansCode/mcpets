@@ -1,0 +1,20 @@
+title: "%language_INVENTORY_MOUNTS_MENU%"
+type: PAGINATED
+rows: 6
+items:
+  previous:
+    slot: 45
+    material: ARROW
+    name: "%language_PREVIOUS_PAGE_ITEM_NAME%"
+    lore:
+      - "%language_PREVIOUS_PAGE_ITEM_DESCRIPTION%"
+    action: PREVIOUS_PAGE
+    pagination-previous: true
+  next:
+    slot: 53
+    material: ARROW
+    name: "%language_NEXT_PAGE_ITEM_NAME%"
+    lore:
+      - "%language_NEXT_PAGE_ITEM_DESCRIPTION%"
+    action: NEXT_PAGE
+    pagination-next: true

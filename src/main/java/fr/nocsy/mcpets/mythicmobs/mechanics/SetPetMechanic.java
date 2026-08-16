@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 import fr.nocsy.mcpets.data.PetDespawnReason;
 
@@ -53,9 +54,7 @@ public class SetPetMechanic extends SkillMechanic implements ITargetedEntitySkil
             return SkillResult.CONDITION_FAILED;
         }
 
-        Bukkit.getScheduler().runTask(
-                MCPets.getInstance(),
-                () -> MCPets.getMythicMobs()
+        FoliaCompat.runGlobal(() -> MCPets.getMythicMobs()
                         .getMobManager()
                         .getActiveMob(data.getCaster().getEntity().getUniqueId())
                         .ifPresent(activeMob ->

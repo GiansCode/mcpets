@@ -1,5 +1,7 @@
 package fr.nocsy.mcpets.data.config;
 
+import fr.nocsy.mcpets.utils.Utils;
+
 import fr.nocsy.mcpets.MCPets;
 import fr.nocsy.mcpets.utils.PDCTag;
 import fr.nocsy.mcpets.data.Category;
@@ -140,7 +142,7 @@ public class CategoryConfig extends AbstractConfig {
         final ItemStack it = Items.UNKNOWN.getItem().clone();
         final ItemMeta meta = it.getItemMeta();
         PDCTag.set(meta, "MCPets;" + id);
-        meta.setDisplayName("§6" + id);
+        meta.displayName(Utils.toComponent("<gold>" + id + "</gold>"));
         it.setItemMeta(meta);
         return it;
     }

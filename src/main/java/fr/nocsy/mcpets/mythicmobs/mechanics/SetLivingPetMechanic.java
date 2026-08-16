@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.bukkit.Bukkit;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.Pet;
 
 import io.lumine.mythic.core.mobs.ActiveMob;
@@ -49,9 +50,7 @@ public class SetLivingPetMechanic extends SkillMechanic implements ITargetedEnti
             return SkillResult.CONDITION_FAILED;
         }
 
-        Bukkit.getScheduler().runTask(
-                MCPets.getInstance(),
-                () -> {
+        FoliaCompat.runGlobal(() -> {
                     Optional<ActiveMob> activeMob = MCPets.getMythicMobs().getMobManager().getActiveMob(entity.getUniqueId());
 
                     activeMob.ifPresent(pet::setActiveMob);

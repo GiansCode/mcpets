@@ -4,7 +4,7 @@ import fr.nocsy.mcpets.PPermission;
 import fr.nocsy.mcpets.commands.AArgument;
 import fr.nocsy.mcpets.data.config.FormatArg;
 import fr.nocsy.mcpets.data.config.Language;
-import fr.nocsy.mcpets.data.inventories.PetMenu;
+import fr.nocsy.mcpets.data.menus.MenuService;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -29,7 +29,6 @@ public class ArgumentOpen extends AArgument {
             return;
         }
 
-        PetMenu menu = new PetMenu(playerToOpen, 0);
-        menu.open((Player) sender);
+        MenuService.getInstance().openPets(playerToOpen);
     }
 }

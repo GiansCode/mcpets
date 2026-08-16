@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
 import fr.nocsy.mcpets.MCPets;
+import fr.nocsy.mcpets.utils.FoliaCompat;
 import fr.nocsy.mcpets.data.config.ItemsListConfig;
 
 import io.lumine.mythic.bukkit.BukkitAdapter;
@@ -43,9 +44,7 @@ public class DropPetItemMechanic extends SkillMechanic implements ITargetedEntit
         ItemStack item = ItemsListConfig.getInstance().getItemStack(petItemId);
 
         if (item != null && ThreadLocalRandom.current().nextFloat() <= percentage) {
-            Bukkit.getScheduler().runTask(
-                    MCPets.getInstance(),
-                    () -> entity.getWorld().dropItemNaturally(
+            FoliaCompat.runGlobal(() -> entity.getWorld().dropItemNaturally(
                             entity.getLocation(),
                             item
                     )

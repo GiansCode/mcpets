@@ -9,145 +9,145 @@ import net.kyori.adventure.text.Component;
 
 public enum Language {
 
-    INVENTORY_PETS_MENU("§0☀ §4Pets §0☀"),
-    INVENTORY_PETS_MENU_INTERACTIONS("§0☀ §4Pet §0☀"),
+    INVENTORY_PETS_MENU("<black>☀ <dark_red>Pets <black>☀"),
+    INVENTORY_PETS_MENU_INTERACTIONS("<black>☀ <dark_red>Pet <black>☀"),
 
-    INVENTORY_MOUNTS_MENU("§0☀ §4Mounts §0☀"),
-    INVENTORY_MOUNTS_MENU_INTERACTIONS("§0☀ §4Mount §0☀"),
+    INVENTORY_MOUNTS_MENU("<black>☀ <dark_red>Mounts <black>☀"),
+    INVENTORY_MOUNTS_MENU_INTERACTIONS("<black>☀ <dark_red>Mount <black>☀"),
 
-    MOUNT_ITEM_NAME("§6Mount"),
-    MOUNT_ITEM_DESCRIPTION("§7Click to mount your pet"),
+    MOUNT_ITEM_NAME("<gold>Mount"),
+    MOUNT_ITEM_DESCRIPTION("<gray>Click to mount your pet"),
 
-    RENAME_ITEM_NAME("§6Rename"),
-    RENAME_ITEM_DESCRIPTION("§7Click to rename your pet"),
+    RENAME_ITEM_NAME("<gold>Rename"),
+    RENAME_ITEM_DESCRIPTION("<gray>Click to rename your pet"),
 
-    BACK_TO_PETMENU_ITEM_NAME("§cBack to menu"),
-    BACK_TO_PETMENU_ITEM_DESCRIPTION("§7Click to get back to the menu"),
+    BACK_TO_PETMENU_ITEM_NAME("<red>Back to menu"),
+    BACK_TO_PETMENU_ITEM_DESCRIPTION("<gray>Click to get back to the menu"),
 
-    INVENTORY_ITEM_NAME("§6Inventory"),
-    INVENTORY_ITEM_DESCRIPTION("§7Click to open the pet's inventory"),
+    INVENTORY_ITEM_NAME("<gold>Inventory"),
+    INVENTORY_ITEM_DESCRIPTION("<gray>Click to open the pet's inventory"),
 
-    SKINS_ITEM_NAME("§6Skins"),
-    SKINS_ITEM_DESCRIPTION("§7Click to change your pet's skin"),
+    SKINS_ITEM_NAME("<gold>Skins"),
+    SKINS_ITEM_DESCRIPTION("<gray>Click to change your pet's skin"),
 
-    EQUIPMENT_ITEM_NAME("§6Equipment"),
-    EQUIPMENT_DESCRIPTION("§7Click to open your pet's equipment"),
+    EQUIPMENT_ITEM_NAME("<gold>Equipment"),
+    EQUIPMENT_DESCRIPTION("<gray>Click to open your pet's equipment"),
 
-    NEXT_PAGE_ITEM_NAME("§6Next page §7(§e%currentPage%§8/§7%maxPage%)"),
-    NEXT_PAGE_ITEM_DESCRIPTION("§eClick§7 to go forward"),
+    NEXT_PAGE_ITEM_NAME("<gold>Next page <gray>(<yellow>%currentPage%<dark_gray>/<gray>%maxPage%)"),
+    NEXT_PAGE_ITEM_DESCRIPTION("<yellow>Click<gray> to go forward"),
 
-    PREVIOUS_PAGE_ITEM_NAME("§6Previous page §7(§e%currentPage%§8/§7%maxPage%)"),
-    PREVIOUS_PAGE_ITEM_DESCRIPTION("§eClick§7 to go backward"),
+    PREVIOUS_PAGE_ITEM_NAME("<gold>Previous page <gray>(<yellow>%currentPage%<dark_gray>/<gray>%maxPage%)"),
+    PREVIOUS_PAGE_ITEM_DESCRIPTION("<yellow>Click<gray> to go backward"),
 
-    NICKNAME("§9Nickname : §7%nickname%"),
-    NICKNAME_ITEM_LORE("§cClick here to revoke your pet"),
+    NICKNAME("<blue>Nickname : <gray>%nickname%"),
+    NICKNAME_ITEM_LORE("<red>Click here to revoke your pet"),
 
-    SUMMONED("§7A pet has been summoned !"),
-    REVOKED("§7Your pet was revoked."),
-    REVOKED_FOR_NEW_ONE("§7Your previous pet was revoked to summon the new one."),
-    REVOKED_UNKNOWN("§cThe pet could not be spawned due to one of the following reasons :" +
-            "\n§7- The provided §cMythicMob in the pet config doesn't exist§7 (try to spawn it through /mm m spawn)§7." +
-            "\n§7- The world is on §cpeaceful or easy mode§7." +
-            "\n§7- A region §cprevents the mob from spawning§7 (the anchor is an aggressive mob most likely)." +
-            "\n§7- You have a §cspawn protector plugin§7, try to spawn the mob in another world or far from spawn." +
-            "\n§7- There exist other pets with the §csame id§7. Make sure you have unique ids."),
-    MYTHICMOB_NULL("§cThis pet could not be summoned. The associated mythicMob entity or file is null or was removed."),
-    NO_MOB_MATCH("§cThis pet could not be summoned. The associated mythicmob isn't registered in MythicMobs."),
-    NOT_ALLOWED("§cYou're not allowed to summon this pet."),
-    OWNER_NOT_FOUND("§cThis pet could not be summoned. The summoner couldn't be found."),
-    REVOKED_BEFORE_CHANGES("§cYour pet was revoked before the modifications could take place."),
-    NOT_MOUNTABLE("§cThis pet has no mounting point."),
-    ALREADY_MOUNTING("§cYou are already riding something. Please dismount before you attempt again."),
-    NOT_MOUNTABLE_HERE("§cYou can't ride a pet in this area."),
-    CANT_MOUNT_PET_YET("§cYou do not have the permission to ride that pet."),
-    CANT_FOLLOW_HERE("§cYour pet can't follow you in this area."),
-    TYPE_NAME_IN_CHAT("§aWrite down in the chat the name of your pet."),
-    IF_WISH_TO_REMOVE_NAME("§aIf you wish to remove it, write §c%tag%§a in the chat."),
-    NICKNAME_CHANGED_SUCCESSFULY("§aNickname successfully changed !"),
-    NICKNAME_NOT_CHANGED("§cNickname could not be changed due to it being an empty string. Please try again."),
+    SUMMONED("<gray>A pet has been summoned !"),
+    REVOKED("<gray>Your pet was revoked."),
+    REVOKED_FOR_NEW_ONE("<gray>Your previous pet was revoked to summon the new one."),
+    REVOKED_UNKNOWN("<red>The pet could not be spawned due to one of the following reasons :" +
+            "\n<gray>- The provided <red>MythicMob in the pet config doesn't exist<gray> (try to spawn it through /mm m spawn)<gray>." +
+            "\n<gray>- The world is on <red>peaceful or easy mode<gray>." +
+            "\n<gray>- A region <red>prevents the mob from spawning<gray> (the anchor is an aggressive mob most likely)." +
+            "\n<gray>- You have a <red>spawn protector plugin<gray>, try to spawn the mob in another world or far from spawn." +
+            "\n<gray>- There exist other pets with the <red>same id<gray>. Make sure you have unique ids."),
+    MYTHICMOB_NULL("<red>This pet could not be summoned. The associated mythicMob entity or file is null or was removed."),
+    NO_MOB_MATCH("<red>This pet could not be summoned. The associated mythicmob isn't registered in MythicMobs."),
+    NOT_ALLOWED("<red>You're not allowed to summon this pet."),
+    OWNER_NOT_FOUND("<red>This pet could not be summoned. The summoner couldn't be found."),
+    REVOKED_BEFORE_CHANGES("<red>Your pet was revoked before the modifications could take place."),
+    NOT_MOUNTABLE("<red>This pet has no mounting point."),
+    ALREADY_MOUNTING("<red>You are already riding something. Please dismount before you attempt again."),
+    NOT_MOUNTABLE_HERE("<red>You can't ride a pet in this area."),
+    CANT_MOUNT_PET_YET("<red>You do not have the permission to ride that pet."),
+    CANT_FOLLOW_HERE("<red>Your pet can't follow you in this area."),
+    TYPE_NAME_IN_CHAT("<green>Write down in the chat the name of your pet."),
+    IF_WISH_TO_REMOVE_NAME("<green>If you wish to remove it, write <red>%tag%<green> in the chat."),
+    NICKNAME_CHANGED_SUCCESSFULY("<green>Nickname successfully changed !"),
+    NICKNAME_NOT_CHANGED("<red>Nickname could not be changed due to it being an empty string. Please try again."),
     TAG_TO_REMOVE_NAME("None"),
-    ALREADY_INSIDE_VEHICULE("§7You're already mounting something. Please dismount your current mount to use this feature."),
-    PET_DOESNT_EXIST("§cThis pet doesn't exist. Please check the id."),
-    PLAYER_NOT_CONNECTED("§cThe player §6%player%§c isn't connected."),
-    BLACKLISTED_WORD("§cRename operation has been cancelled. The word %word% is not allowed in a pet name."),
-    NO_ACTIVE_PET("§cYou have no active pet."),
-    SPECIFY_PET("§cYou have multiple active pets. Please specify which one: §e%pets%"),
-    SIGNAL_STICK_GIVEN("§aYou've received an order stick. Right click to cast an order, left click to switch orders."),
-    SIGNAL_STICK_SIGNAL("§6Active order : §e%signal%"),
-    LOOP_SPAWN("§cYour pet was revoked because it seems to struggle with numerous teleportations."),
-    REQUIRES_ITEM_IN_HAND("§cYou must holding an item in your hand it update it in the config."),
-    ITEM_UPDATED("§aItem updated successful with the key : §e%key%"),
-    ITEM_DOESNT_EXIST("§aThe item with the key §e%key%§c doesn't exist. If you want to add it you can use the §eadd§c argument instead."),
-    KEY_DOESNT_EXIST("§cThe specified key is not registered."),
-    KEY_REMOVED("§aThe key item was removed succesfully."),
-    KEY_ALREADY_EXISTS("§cThis key is already registered. Use it to replace the current item."),
-    KEY_ADDED("§aKey added successfully with the corresponding item."),
-    KEY_LIST("§aAvailable keys :"),
+    ALREADY_INSIDE_VEHICULE("<gray>You're already mounting something. Please dismount your current mount to use this feature."),
+    PET_DOESNT_EXIST("<red>This pet doesn't exist. Please check the id."),
+    PLAYER_NOT_CONNECTED("<red>The player <gold>%player%<red> isn't connected."),
+    BLACKLISTED_WORD("<red>Rename operation has been cancelled. The word %word% is not allowed in a pet name."),
+    NO_ACTIVE_PET("<red>You have no active pet."),
+    SPECIFY_PET("<red>You have multiple active pets. Please specify which one: <yellow>%pets%"),
+    SIGNAL_STICK_GIVEN("<green>You've received an order stick. Right click to cast an order, left click to switch orders."),
+    SIGNAL_STICK_SIGNAL("<gold>Active order : <yellow>%signal%"),
+    LOOP_SPAWN("<red>Your pet was revoked because it seems to struggle with numerous teleportations."),
+    REQUIRES_ITEM_IN_HAND("<red>You must holding an item in your hand it update it in the config."),
+    ITEM_UPDATED("<green>Item updated successful with the key : <yellow>%key%"),
+    ITEM_DOESNT_EXIST("<green>The item with the key <yellow>%key%<red> doesn't exist. If you want to add it you can use the <yellow>add<red> argument instead."),
+    KEY_DOESNT_EXIST("<red>The specified key is not registered."),
+    KEY_REMOVED("<green>The key item was removed succesfully."),
+    KEY_ALREADY_EXISTS("<red>This key is already registered. Use it to replace the current item."),
+    KEY_ADDED("<green>Key added successfully with the corresponding item."),
+    KEY_LIST("<green>Available keys :"),
 
-    RELOAD_SUCCESS("§aReloaded successfully."),
-    HOW_MANY_PETS_LOADED("§a%numberofpets% were registered successfully"),
+    RELOAD_SUCCESS("<green>Reloaded successfully."),
+    HOW_MANY_PETS_LOADED("<green>%numberofpets% were registered successfully"),
 
-    REQUIRES_MODELENGINE("§cThis plugin requires ModelEngine R4.0.6 or BetterModel v2.0.1. It seems that this requirement is not satisfied."),
+    REQUIRES_MODELENGINE("<red>This plugin requires ModelEngine R4.0.6 or BetterModel v2.0.1. It seems that this requirement is not satisfied."),
 
-    USAGE("§cThis command doesn't exist. \n§7Check out the wiki: §nhttps://mcpets.gitbook.io/mcpets/tutorials/plugin-features/commands"),
-    NO_PERM("§cYou're not allowed to use this command."),
-    BLACKLISTED_WORLD("§cMCPets is disabled in this world."),
+    USAGE("<red>This command doesn't exist. \n<gray>Check out the wiki: <underlined>https://mcpets.gitbook.io/mcpets/tutorials/plugin-features/commands"),
+    NO_PERM("<red>You're not allowed to use this command."),
+    BLACKLISTED_WORLD("<red>MCPets is disabled in this world."),
 
-    CATEGORY_MENU_TITLE("§0☀ §4Pets §8- Pick a category §0☀"),
-    CATEGORY_DOESNT_EXIST("§cThis category does not exist."),
+    CATEGORY_MENU_TITLE("<black>☀ <dark_red>Pets <dark_gray>- Pick a category <black>☀"),
+    CATEGORY_DOESNT_EXIST("<red>This category does not exist."),
 
-    PET_INVENTORY_TITLE("§0☀ §4%pet% §8- §0Inventory §0☀§"),
+    PET_INVENTORY_TITLE("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
 
-    PET_INVENTORY_COULDNOT_OPEN("§cThis inventory can not be opened as it may not exist."),
+    PET_INVENTORY_COULDNOT_OPEN("<red>This inventory can not be opened as it may not exist."),
 
-    PET_SKINS_TITLE("§0☀ §4%pet% §8- §0Skins §0☀§"),
+    PET_SKINS_TITLE("<black>☀ <dark_red>%pet% <dark_gray>- <black>Skins <black>☀"),
 
-    SKIN_COULD_NOT_APPLY("§cThe skin could not be applied to the pet."),
-    SKIN_APPLIED("§aSkin changed successfully !"),
+    SKIN_COULD_NOT_APPLY("<red>The skin could not be applied to the pet."),
+    SKIN_APPLIED("<green>Skin changed successfully !"),
 
-    GLOBAL_RESPAWN_TIMER_RUNNING("§cThis pet could not be spawned. You need to wait %timeLeft%s/%cooldown%s."),
-    RESPAWN_TIMER_RUNNING("§cThis pet could not be spawned. It's still recovering from its wounds. You need to wait %timeLeft%s/%cooldown%s."),
-    REVOKE_TIMER_RUNNING("§cThis pet could not be spawned. It's still recovering from its wounds. You need to wait %timeLeft%s/%cooldown%s."),
+    GLOBAL_RESPAWN_TIMER_RUNNING("<red>This pet could not be spawned. You need to wait %timeLeft%s/%cooldown%s."),
+    RESPAWN_TIMER_RUNNING("<red>This pet could not be spawned. It's still recovering from its wounds. You need to wait %timeLeft%s/%cooldown%s."),
+    REVOKE_TIMER_RUNNING("<red>This pet could not be spawned. It's still recovering from its wounds. You need to wait %timeLeft%s/%cooldown%s."),
 
-    PLAYER_OR_PET_DOESNT_EXIST("§cThis pet doesn't exist, or this player has never played on your server."),
-    STATS_CLEARED("§aAll stats have been cleared successfully !"),
-    STATS_CLEARED_FOR_PET_FOR_PLAYER("§aAll stats have been cleared successfully for the pet %petId% for the player %player%."),
-    STATS_CLEARED_FOR_PET("§aAll stats have been cleared successfully for the pet %petId%"),
+    PLAYER_OR_PET_DOESNT_EXIST("<red>This pet doesn't exist, or this player has never played on your server."),
+    STATS_CLEARED("<green>All stats have been cleared successfully !"),
+    STATS_CLEARED_FOR_PET_FOR_PLAYER("<green>All stats have been cleared successfully for the pet %petId% for the player %player%."),
+    STATS_CLEARED_FOR_PET("<green>All stats have been cleared successfully for the pet %petId%"),
 
-    PET_TAMING_PROGRESS("§7Taming progress §a%progress%% §7- %progressbar%"),
-    PET_COULD_NOT_EVOLVE("§7Your pet could not evolve because §cyou already own the evolution§7."),
-    PETFOOD_DOESNT_EXIST("§cThis pet food doesn't exist."),
-    PETUNLOCK_NOPERM("§cYou are not allowed to use this item to unlock the pet."),
-    PETUNLOCKED("§aYou've unlocked the pet %petName%, congratulations !"),
-    PETUNLOCKED_ALREADY("§cYou already own the pet §6%petName%§c."),
+    PET_TAMING_PROGRESS("<gray>Taming progress <green>%progress%% <gray>- %progressbar%"),
+    PET_COULD_NOT_EVOLVE("<gray>Your pet could not evolve because <red>you already own the evolution<gray>."),
+    PETFOOD_DOESNT_EXIST("<red>This pet food doesn't exist."),
+    PETUNLOCK_NOPERM("<red>You are not allowed to use this item to unlock the pet."),
+    PETUNLOCKED("<green>You've unlocked the pet %petName%, congratulations !"),
+    PETUNLOCKED_ALREADY("<red>You already own the pet <gold>%petName%<red>."),
 
-    PET_ALREADY_TAMED("§cThis pet is already tamed."),
-    PET_DOESNT_EAT("§cThis pet can not eat that food."),
-    PET_FOOD_ON_COOLDOWN("§cThe pet won't eat this food for another %timeleft% seconds"),
+    PET_ALREADY_TAMED("<red>This pet is already tamed."),
+    PET_DOESNT_EAT("<red>This pet can not eat that food."),
+    PET_FOOD_ON_COOLDOWN("<red>The pet won't eat this food for another %timeleft% seconds"),
 
-    PET_STATUS_ALIVE("§aAvailable"),
-    PET_STATUS_REVOKED("§cUnavailable §7(%timeleft%s left)"),
-    PET_STATUS_DEAD("§cDead §7(%timeleft%s left)"),
+    PET_STATUS_ALIVE("<green>Available"),
+    PET_STATUS_REVOKED("<red>Unavailable <gray>(%timeleft%s left)"),
+    PET_STATUS_DEAD("<red>Dead <gray>(%timeleft%s left)"),
 
-    PET_STATS("§6✦ Pet's Information ✦" +
-            "\n§7Status: %status%" +
-            "\n§6Level §7- §6%levelname%" +
+    PET_STATS("<gold>✦ Pet's Information ✦" +
+            "\n<gray>Status: %status%" +
+            "\n<gold>Level <gray>- <gold>%levelname%" +
             "\n " +
-            "\n§f%health%§7/§f%maxhealth% §c❤" +
-            "\n§7Regeneration: %regeneration% ❤/s" +
-            "\n§7Damage Modifier: §f%damagemodifier%%" +
-            "\n§7Resistance Modifier: §f%resistancemodifier%%" +
-            "\n§7Power: §f%power%%" +
+            "\n<white>%health%<gray>/<white>%maxhealth% <red>❤" +
+            "\n<gray>Regeneration: %regeneration% ❤/s" +
+            "\n<gray>Damage Modifier: <white>%damagemodifier%%" +
+            "\n<gray>Resistance Modifier: <white>%resistancemodifier%%" +
+            "\n<gray>Power: <white>%power%%" +
             "\n " +
-            "\n§7Experience: §a%experience%/%threshold% xp" +
+            "\n<gray>Experience: <green>%experience%/%threshold% xp" +
             "\n%progressbar%"),
 
-    PET_STATS_EVOLUTION_ALREADY_OWNED("§cEvolution already owned."),
-    PET_STATS_MAX_LEVEL("§7Maximum level reached."),
-    MAX_ACTIVE_PETS_REACHED("§cYou have reached the maximum number of active pets!"),
-    PET_REPLACED_BY_NEW("§e%oldpet% has been replaced by %newpet%!"),
-    DEBUGGER_JOINING("§aDebugger is enabled. You are now listening to it."),
-    DEBUGGER_LEAVE("§aDebugger is §7disabled§a. You will not be listening to it anymore.");
+    PET_STATS_EVOLUTION_ALREADY_OWNED("<red>Evolution already owned."),
+    PET_STATS_MAX_LEVEL("<gray>Maximum level reached."),
+    MAX_ACTIVE_PETS_REACHED("<red>You have reached the maximum number of active pets!"),
+    PET_REPLACED_BY_NEW("<yellow>%oldpet% has been replaced by %newpet%!"),
+    DEBUGGER_JOINING("<green>Debugger is enabled. You are now listening to it."),
+    DEBUGGER_LEAVE("<green>Debugger is <gray>disabled<green>. You will not be listening to it anymore.");
 
     private String message;
 

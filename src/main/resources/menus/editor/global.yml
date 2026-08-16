@@ -1,0 +1,29 @@
+title: "<gold>MCPets Editor</gold>"
+type: CHEST
+rows: 1
+items:
+  config:
+    slot: 0
+    material: COMPARATOR
+    name: "<yellow>Config Editor</yellow>"
+    action: "EDITOR_NAVIGATE:CONFIG_EDITOR"
+  pets:
+    slot: 1
+    material: BONE
+    name: "<yellow>Pet Editor</yellow>"
+    action: "EDITOR_NAVIGATE:PET_EDITOR"
+  categories:
+    slot: 2
+    material: CHEST
+    name: "<yellow>Category Editor</yellow>"
+    action: "EDITOR_NAVIGATE:CATEGORY_EDITOR"
+  items:
+    slot: 3
+    material: PAPER
+    name: "<yellow>Item Editor</yellow>"
+    action: "EDITOR_NAVIGATE:ITEM_EDITOR"
+  petfood:
+    slot: 4
+    material: COOKED_BEEF
+    name: "<yellow>Pet Food Editor</yellow>"
+    action: "EDITOR_NAVIGATE:PETFOOD_EDITOR"
