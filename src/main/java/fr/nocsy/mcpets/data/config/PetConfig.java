@@ -312,23 +312,23 @@ public class PetConfig extends AbstractConfig {
             String evolutionId = null;
             int delayBeforeEvolution = 0;
             boolean removePrevious = true;
-            final double maxHealth = Optional.of(getConfig().getDouble(key + ".MaxHealth")).orElse(10D);
-            final double regeneration = Optional.of(getConfig().getDouble(key + ".Regeneration")).orElse(0.1);
-            final double resistanceModifier = Optional.of(getConfig().getDouble(key + ".ResistanceModifier")).orElse(1D);
-            final double damageModifier = Optional.of(getConfig().getDouble(key + ".DamageModifier")).orElse(1D);
-            final double power = Optional.of(getConfig().getDouble(key + ".Power")).orElse(1D);
-            final int respawnCooldown = Optional.of(getConfig().getInt(key + ".Cooldowns.Respawn")).orElse(GlobalConfig.getInstance().getDefaultRespawnCooldown());
-            final int revokeCooldown = Optional.of(getConfig().getInt(key + ".Cooldowns.Revoke")).orElse(0);
-            final int inventoryExtension = Optional.of(getConfig().getInt(key + ".InventoryExtension")).orElse(0);
+            final double maxHealth = getConfig().getDouble(key + ".MaxHealth", 10D);
+            final double regeneration = getConfig().getDouble(key + ".Regeneration", 0.1);
+            final double resistanceModifier = getConfig().getDouble(key + ".ResistanceModifier", 1D);
+            final double damageModifier = getConfig().getDouble(key + ".DamageModifier", 1D);
+            final double power = getConfig().getDouble(key + ".Power", 1D);
+            final int respawnCooldown = getConfig().getInt(key + ".Cooldowns.Respawn", GlobalConfig.getInstance().getDefaultRespawnCooldown());
+            final int revokeCooldown = getConfig().getInt(key + ".Cooldowns.Revoke", 0);
+            final int inventoryExtension = getConfig().getInt(key + ".InventoryExtension", 0);
             final String levelName = getConfig().getString(key + ".Name");
             final double expThreshold = getConfig().getDouble(key + ".ExperienceThreshold");
             String announcement = null;
             PetAnnouncement announcementType = null;
-            final String mythicSkill = Optional.ofNullable(getConfig().getString(key + ".Announcement.Skill")).orElse(null);
+            final String mythicSkill = getConfig().getString(key + ".Announcement.Skill");
 
             if (getConfig().get(key + ".Evolution.PetId") != null) {
                 evolutionId = getConfig().getString(key + ".Evolution.PetId");
-                delayBeforeEvolution = Optional.of(getConfig().getInt(key + ".Evolution.DelayBeforeEvolution")).orElse(0);
+                delayBeforeEvolution = getConfig().getInt(key + ".Evolution.DelayBeforeEvolution", 0);
                 removePrevious = getConfig().get(key + ".Evolution.RemoveAccess") == null ||
                         getConfig().getBoolean(key + ".Evolution.RemoveAccess");
             }

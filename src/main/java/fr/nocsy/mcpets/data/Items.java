@@ -45,7 +45,7 @@ public enum Items {
     Items(String name) {
         this.name = name;
         if (ItemsListConfig.getInstance().getItemStack(name) != null) {
-            item = ItemsListConfig.getInstance().getItemStack(name);
+            item = ItemsListConfig.getInstance().getItemStack(name).clone();
             prepareItem();
             return;
         }
@@ -87,6 +87,7 @@ public enum Items {
     private void prepareItem() {
         ItemMeta meta = item.getItemMeta();
         PDCTag.set(meta, getLocalizedName());
+        
         item.setItemMeta(meta);
     }
 
