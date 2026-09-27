@@ -1,7 +1,9 @@
 title: "%language_INVENTORY_PETS_MENU%"
 type: PAGINATED
 rows: 6
-content-slots: []
+# Pet icons are placed only in these slots (paged).
+# Examples: 0-44   or   10-16   or   [10, 11, 12, 19, 20, 21]
+content-slots: 0-44
 items:
   previous:
     slot: 45

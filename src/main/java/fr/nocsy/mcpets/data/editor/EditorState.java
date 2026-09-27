@@ -74,8 +74,14 @@ public enum EditorState {
     public void openView(final Player p) {
         // GLOBAL_EDITOR is driven by menus/editor/global.yml via Triumph
         if (this == GLOBAL_EDITOR) {
-            fr.nocsy.mcpets.data.menus.MenuService.getInstance()
-                    .open("global", fr.nocsy.mcpets.data.menus.MenuContext.of(p));
+            final var menus = fr.nocsy.mcpets.data.menus.MenuService.getInstance();
+            final String globalId = menus.get("editor-global") != null ? "editor-global" : "global";
+            menus.open(globalId, fr.nocsy.mcpets.data.menus.MenuContext.of(p));
+            return;
+        }
+        // PET_EDITOR is driven by menus/editor/pets.yml (content-slots)
+        if (this == PET_EDITOR) {
+            fr.nocsy.mcpets.data.menus.MenuService.getInstance().openPetEditor(p);
             return;
         }
         this.buildInventory(p);
@@ -141,36 +147,84 @@ public enum EditorState {
                 currentView.setItem(position, item.getItem());
             }
         } else if (this.equals(EditorState.PET_EDITOR)) {
-            currentView = new PetInventoryHolder(INV_SIZE, getMenuTitle(), INV_TYPE).getInventory();
+            // Always re-read plugins/MCPets/menus/editor/pets.yml so content-slots edits apply on reload
+            final fr.nocsy.mcpets.data.menus.MenuDefinition menuDef =
+                    fr.nocsy.mcpets.data.menus.MenuService.getInstance().loadEditorPetsMenu();
+            final String title = menuDef != null ? menuDef.getTitle() : getMenuTitle();
+            final int rows = menuDef != null ? menuDef.getRows() : 6;
+            final int size = Math.max(9, Math.min(54, rows * 9));
+            currentView = new PetInventoryHolder(size, title, INV_TYPE).getInventory();
 
-            for(int i = 45; i < 53; i++) {
+            final List<Integer> contentSlots = menuDef != null
+                    ? menuDef.resolveContentSlots()
+                    : defaultContentSlots(size);
+            final int pageSize = Math.max(1, contentSlots.size());
+            final int page = EditorPageSelection.get(p);
+
+            fr.nocsy.mcpets.MCPets.getLog().info("[MCPets] Pet editor content-slots (" + contentSlots.size()
+                    + "): " + contentSlots);
+
+            // Static controls from YAML slots (EditorItems so clicks still work)
+            int backSlot = Math.min(45, size - 1);
+            int createSlot = Math.min(49, size - 1);
+            int pageSlot = Math.min(53, size - 1);
+            if (menuDef != null) {
+                for (final fr.nocsy.mcpets.data.menus.MenuItemDefinition item : menuDef.getItems()) {
+                    if (item.getSlot() < 0 || item.getSlot() >= size) {
+                        continue;
+                    }
+                    final String id = item.getId() != null ? item.getId().toLowerCase() : "";
+                    if ("back".equals(id)) {
+                        backSlot = item.getSlot();
+                    } else if ("create".equals(id)) {
+                        createSlot = item.getSlot();
+                    } else if ("page".equals(id) || item.isPaginationNext() || item.isPaginationPrevious()) {
+                        pageSlot = item.getSlot();
+                    }
+                }
+            }
+            if (backSlot >= 0 && backSlot < size) {
+                currentView.setItem(backSlot, EditorItems.BACK_TO_GLOBAL_SELECTION.getItem());
+            }
+            if (createSlot >= 0 && createSlot < size) {
+                currentView.setItem(createSlot, EditorItems.PET_EDITOR_CREATE_NEW.getItem());
+            }
+            if (pageSlot >= 0 && pageSlot < size) {
+                currentView.setItem(pageSlot, EditorItems.PAGE_SELECTOR.getItem());
+            }
+
+            // Fill unused non-content slots
+            for (int i = 0; i < size; i++) {
+                if (currentView.getItem(i) != null || contentSlots.contains(Integer.valueOf(i))) {
+                    continue;
+                }
                 currentView.setItem(i, EditorItems.FILLER.getItem());
             }
-            currentView.setItem(53, EditorItems.PAGE_SELECTOR.getItem());
-            currentView.setItem(49, EditorItems.PET_EDITOR_CREATE_NEW.getItem());
-            currentView.setItem(45, EditorItems.BACK_TO_GLOBAL_SELECTION.getItem());
 
-            final int page = EditorPageSelection.get(p);
+            final EditorEditing editing = EditorEditing.get(p);
+            editing.getEditorMapping().clear();
+
             final List<Pet> pets = Pet.getObjectPets();
-
-            int currentIndex = 0;
-            int inventoryPosition = 0;
-            for(final Pet pet : pets) {
-                if (EditorItems.getCachedDeleted().contains(pet.getId()))
-                    continue;
-                if (currentIndex < 45*page) {
-                    currentIndex++;
+            int visibleIndex = 0;
+            for (final Pet pet : pets) {
+                if (EditorItems.getCachedDeleted().contains(pet.getId())) {
                     continue;
                 }
-                else if (inventoryPosition < currentView.getSize()-9) {
-
+                if (visibleIndex < pageSize * page) {
+                    visibleIndex++;
+                    continue;
+                }
+                final int slotOffset = visibleIndex - pageSize * page;
+                if (slotOffset >= contentSlots.size()) {
+                    break;
+                }
+                final int slot = contentSlots.get(slotOffset);
+                if (slot >= 0 && slot < size) {
                     final ItemStack icon = EditorItems.PET_EDITOR_EDIT_PET.setupPetIcon(pet.getId()).getItem();
-
-                    currentView.setItem(inventoryPosition, icon);
-                    inventoryPosition++;
-                    continue;
+                    currentView.setItem(slot, icon);
+                    editing.getEditorMapping().put(slot, pet.getId());
                 }
-                break;
+                visibleIndex++;
             }
         } else if (this.equals(EditorState.PET_EDITOR_EDIT)) {
             currentView = new PetInventoryHolder(INV_SIZE, getMenuTitle(), INV_TYPE).getInventory();
@@ -504,6 +558,15 @@ public enum EditorState {
 
     public boolean equals(final EditorState other) {
         return other.getStateName().equals(this.stateName);
+    }
+
+    private static List<Integer> defaultContentSlots(final int size) {
+        final List<Integer> slots = new ArrayList<>();
+        final int contentEnd = Math.max(0, size - 9);
+        for (int i = 0; i < contentEnd; i++) {
+            slots.add(i);
+        }
+        return slots;
     }
 
 }

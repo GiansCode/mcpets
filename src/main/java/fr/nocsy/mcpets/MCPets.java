@@ -174,6 +174,7 @@ public class MCPets extends JavaPlugin {
 
             getLog().info("-=-=-=-= MCPets loaded =-=-=-=-");
             getLog().info("      Plugin made by Nocsy     ");
+            getLog().info("      Version " + getDescription().getVersion());
             getLog().info("-=-=-=-= -=-=-=-=-=-=- =-=-=-=-");
 
             FlagsManager.launchFlags();

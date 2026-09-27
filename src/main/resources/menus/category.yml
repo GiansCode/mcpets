@@ -1,6 +1,7 @@
 title: "%category_name%"
 type: PAGINATED
 rows: 6
+content-slots: 0-44
 items:
   back:
     slot: 45

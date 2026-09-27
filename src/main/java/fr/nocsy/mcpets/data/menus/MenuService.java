@@ -14,6 +14,9 @@ import fr.nocsy.mcpets.data.config.AbstractConfig;
 import fr.nocsy.mcpets.data.config.GlobalConfig;
 import fr.nocsy.mcpets.data.config.Language;
 import fr.nocsy.mcpets.data.editor.Editor;
+import fr.nocsy.mcpets.data.editor.EditorEditing;
+import fr.nocsy.mcpets.data.editor.EditorItems;
+import fr.nocsy.mcpets.data.editor.EditorPageSelection;
 import fr.nocsy.mcpets.data.editor.EditorState;
 import fr.nocsy.mcpets.data.sql.PlayerData;
 import fr.nocsy.mcpets.utils.Utils;
@@ -57,11 +60,7 @@ public class MenuService {
             folder.mkdirs();
         }
         saveDefaults(folder);
-        loadFolder(folder);
-        final File editorFolder = new File(folder, "editor");
-        if (editorFolder.exists()) {
-            loadFolder(editorFolder);
-        }
+        loadFolder(folder, "");
         MCPets.getLog().info("[MCPets] Loaded " + menus.size() + " menu definition(s).");
     }
 
@@ -73,20 +72,36 @@ public class MenuService {
         };
         for (final String name : defaults) {
             final File target = new File(folder, name);
-            if (target.exists()) {
-                continue;
-            }
             target.getParentFile().mkdirs();
             try (InputStream in = MCPets.getInstance().getResource("menus/" + name)) {
-                if (in != null) {
+                if (in == null) {
+                    if (!target.exists()) {
+                        final YamlConfiguration cfg = new YamlConfiguration();
+                        cfg.set("title", "<white>" + name + "</white>");
+                        cfg.set("rows", 6);
+                        cfg.set("type", "CHEST");
+                        cfg.save(target);
+                    }
+                    continue;
+                }
+                if (!target.exists()) {
                     Files.copy(in, target.toPath());
-                } else {
-                    // Fallback empty stub so something exists
-                    final YamlConfiguration cfg = new YamlConfiguration();
-                    cfg.set("title", "<white>" + name + "</white>");
-                    cfg.set("rows", 6);
-                    cfg.set("type", "CHEST");
-                    cfg.save(target);
+                    continue;
+                }
+                // Existing install: merge missing keys from jar so new options like content-slots appear
+                final YamlConfiguration jarCfg = YamlConfiguration.loadConfiguration(
+                        new java.io.InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8));
+                final YamlConfiguration diskCfg = YamlConfiguration.loadConfiguration(target);
+                boolean changed = false;
+                if (!diskCfg.contains("content-slots") && !diskCfg.contains("content_slots")
+                        && (jarCfg.contains("content-slots") || jarCfg.contains("content_slots"))) {
+                    final String key = jarCfg.contains("content-slots") ? "content-slots" : "content_slots";
+                    diskCfg.set("content-slots", jarCfg.get(key));
+                    changed = true;
+                }
+                if (changed) {
+                    diskCfg.save(target);
+                    MCPets.getLog().info("[MCPets] Updated missing keys in menus/" + name);
                 }
             } catch (final Exception ex) {
                 MCPets.getLog().log(Level.WARNING, "Could not save default menu " + name, ex);
@@ -94,13 +109,55 @@ public class MenuService {
         }
     }
 
-    private void loadFolder(final File folder) {
-        final File[] files = folder.listFiles((dir, name) -> name.endsWith(".yml"));
+    /**
+     * Resolve a menu by trying several ids (e.g. editor-pets, then pets).
+     */
+    public MenuDefinition resolve(final String... ids) {
+        for (final String id : ids) {
+            if (id == null) {
+                continue;
+            }
+            final MenuDefinition def = menus.get(id);
+            if (def != null) {
+                return def;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Load the pet-editor YAML from disk every time (authoritative for content-slots).
+     */
+    public MenuDefinition loadEditorPetsMenu() {
+        final File file = new File(AbstractConfig.getPath() + "menus/editor/pets.yml");
+        if (file.exists()) {
+            try {
+                final MenuDefinition fromDisk = MenuDefinition.load("editor-pets", file);
+                menus.put("editor-pets", fromDisk);
+                return fromDisk;
+            } catch (final Exception ex) {
+                MCPets.getLog().log(Level.WARNING, "Failed to load menus/editor/pets.yml", ex);
+            }
+        }
+        return resolve("editor-pets", "pets");
+    }
+
+    private void loadFolder(final File folder, final String idPrefix) {
+        final File[] files = folder.listFiles();
         if (files == null) {
             return;
         }
         for (final File file : files) {
-            final String id = file.getName().replace(".yml", "");
+            if (file.isDirectory()) {
+                final String nextPrefix = idPrefix.isEmpty() ? file.getName() : idPrefix + "-" + file.getName();
+                loadFolder(file, nextPrefix);
+                continue;
+            }
+            if (!file.getName().endsWith(".yml")) {
+                continue;
+            }
+            final String baseName = file.getName().substring(0, file.getName().length() - 4);
+            final String id = idPrefix.isEmpty() ? baseName : idPrefix + "-" + baseName;
             try {
                 menus.put(id, MenuDefinition.load(id, file));
             } catch (final Exception ex) {
@@ -155,14 +212,110 @@ public class MenuService {
     }
 
     public void openEditor(final Player player, final String stateName) {
+        MCPets.getLog().warning("[MCPets] EDITOR_NAVIGATE -> " + stateName);
         try {
             final EditorState state = EditorState.valueOf(stateName);
             final Editor editor = Editor.getEditor(player);
             editor.setState(state);
             editor.openEditor();
         } catch (IllegalArgumentException ex) {
-            open("global", MenuContext.of(player));
+            MCPets.getLog().warning("[MCPets] Unknown editor state: " + stateName);
+            open(resolve("editor-global", "global") != null && get("editor-global") != null
+                    ? "editor-global" : "global", MenuContext.of(player));
         }
+    }
+
+    /**
+     * Opens the pet list editor using {@code menus/editor/pets.yml} content-slots.
+     */
+    public void openPetEditor(final Player player) {
+        final MenuDefinition menuDef = loadEditorPetsMenu();
+        final String title = menuDef != null ? menuDef.getTitle() : EditorState.PET_EDITOR.getMenuTitle();
+        final int rows = menuDef != null ? menuDef.getRows() : 6;
+        final int size = Math.max(9, Math.min(54, rows * 9));
+
+        final List<Integer> contentSlots = menuDef != null
+                ? menuDef.resolveContentSlots()
+                : defaultEditorContentSlots(size);
+
+        MCPets.getLog().warning("[MCPets] openPetEditor content-slots=" + contentSlots
+                + " file=" + AbstractConfig.getPath() + "menus/editor/pets.yml"
+                + " menuDef=" + (menuDef != null ? menuDef.getId() : "null"));
+        // Quiet: no chat spam — slots apply from YAML silently
+
+        final org.bukkit.inventory.Inventory inventory =
+                new fr.nocsy.mcpets.data.inventories.PetInventoryHolder(
+                        size, title, fr.nocsy.mcpets.data.inventories.PetInventoryHolder.Type.EDITOR_MENU)
+                        .getInventory();
+
+        int backSlot = Math.min(45, size - 1);
+        int createSlot = Math.min(49, size - 1);
+        int pageSlot = Math.min(53, size - 1);
+        if (menuDef != null) {
+            for (final MenuItemDefinition item : menuDef.getItems()) {
+                if (item.getSlot() < 0 || item.getSlot() >= size) {
+                    continue;
+                }
+                final String id = item.getId() != null ? item.getId().toLowerCase() : "";
+                if ("back".equals(id)) {
+                    backSlot = item.getSlot();
+                } else if ("create".equals(id)) {
+                    createSlot = item.getSlot();
+                } else if ("page".equals(id) || item.isPaginationNext() || item.isPaginationPrevious()) {
+                    pageSlot = item.getSlot();
+                }
+            }
+        }
+        inventory.setItem(backSlot, EditorItems.BACK_TO_GLOBAL_SELECTION.getItem());
+        inventory.setItem(createSlot, EditorItems.PET_EDITOR_CREATE_NEW.getItem());
+        inventory.setItem(pageSlot, EditorItems.PAGE_SELECTOR.getItem());
+
+        for (int i = 0; i < size; i++) {
+            if (inventory.getItem(i) != null || contentSlots.contains(Integer.valueOf(i))) {
+                continue;
+            }
+            inventory.setItem(i, EditorItems.FILLER.getItem());
+        }
+
+        final EditorEditing editing = EditorEditing.get(player);
+        editing.getEditorMapping().clear();
+        final int page = EditorPageSelection.get(player);
+        final int pageSize = Math.max(1, contentSlots.size());
+
+        int visibleIndex = 0;
+        for (final Pet pet : Pet.getObjectPets()) {
+            if (EditorItems.getCachedDeleted().contains(pet.getId())) {
+                continue;
+            }
+            if (visibleIndex < pageSize * page) {
+                visibleIndex++;
+                continue;
+            }
+            final int slotOffset = visibleIndex - pageSize * page;
+            if (slotOffset >= contentSlots.size()) {
+                break;
+            }
+            final int slot = contentSlots.get(slotOffset);
+            if (slot >= 0 && slot < size) {
+                inventory.setItem(slot, EditorItems.PET_EDITOR_EDIT_PET.setupPetIcon(pet.getId()).getItem());
+                editing.getEditorMapping().put(slot, pet.getId());
+            }
+            visibleIndex++;
+        }
+
+        // Keep Editor state in sync for click listeners / back navigation
+        final Editor editor = Editor.getEditor(player);
+        editor.setState(EditorState.PET_EDITOR);
+        player.openInventory(inventory);
+    }
+
+    private static List<Integer> defaultEditorContentSlots(final int size) {
+        final List<Integer> slots = new ArrayList<>();
+        final int contentEnd = Math.max(0, size - 9);
+        for (int i = 0; i < contentEnd; i++) {
+            slots.add(i);
+        }
+        return slots;
     }
 
     public void openBack(final MenuContext context) {
@@ -196,7 +349,34 @@ public class MenuService {
             case "category" -> openCategoryPets(def, context);
             case "pet-interaction", "mount-interaction" -> openInteractionGui(def, context);
             case "skins" -> openSkinsGui(def, context);
+            case "global", "editor-global" -> openStaticGui(def, context);
             default -> openStaticGui(def, context);
+        }
+    }
+
+    /**
+     * Place dynamic items into YAML {@code content-slots} (or all free slots if unset).
+     */
+    public void placeContent(final org.bukkit.inventory.Inventory inventory,
+                             final MenuDefinition def,
+                             final List<ItemStack> content,
+                             final int page) {
+        final List<Integer> slots = def.resolveContentSlots();
+        if (slots.isEmpty()) {
+            return;
+        }
+        final int pageSize = slots.size();
+        final int start = Math.max(0, page) * pageSize;
+        for (int i = 0; i < pageSize; i++) {
+            final int contentIndex = start + i;
+            if (contentIndex >= content.size()) {
+                break;
+            }
+            final int slot = slots.get(i);
+            if (slot < 0 || slot >= inventory.getSize()) {
+                continue;
+            }
+            inventory.setItem(slot, content.get(contentIndex));
         }
     }
 
@@ -295,29 +475,31 @@ public class MenuService {
             pets = pets.stream().filter(Pet::isMountable).toList();
         }
 
-        final PaginatedGui gui = Gui.paginated()
+        final List<Integer> contentSlots = resolvePagedContentSlots(def);
+        final int pageSize = Math.max(1, contentSlots.size());
+        final int totalPages = Math.max(1, (int) Math.ceil(pets.size() / (double) pageSize));
+        final int page = Math.min(Math.max(1, context.getPage()), totalPages);
+        context.setPage(page);
+
+        final Gui gui = Gui.gui()
                 .title(title(def, context))
                 .rows(resolveRows(def))
                 .disableAllInteractions()
                 .create();
 
-        for (final Pet pet : pets) {
+        final int start = (page - 1) * pageSize;
+        for (int i = 0; i < pageSize && start + i < pets.size(); i++) {
+            final Pet pet = pets.get(start + i);
+            final int slot = contentSlots.get(i);
             final ItemStack icon = pet.buildItem(pet.getIcon(), true);
-            gui.addItem(ItemBuilder.from(icon).asGuiItem(e -> {
+            gui.setItem(slot, ItemBuilder.from(icon).asGuiItem(e -> {
                 e.setCancelled(true);
                 player.closeInventory();
                 pet.copy().spawnWithMessage(player);
             }));
         }
 
-        placeStaticItemsPaginated(gui, def, context, true, true);
-
-        // Jump to requested page
-        for (int i = 1; i < context.getPage(); i++) {
-            if (!gui.next()) {
-                break;
-            }
-        }
+        placeStaticItems(gui, def, context, page > 1, page < totalPages);
         gui.open(player);
     }
 
@@ -332,20 +514,13 @@ public class MenuService {
         }
         final List<Category> categories = Category.getCategories(type);
 
-        // Dynamic title for filter
         if ("MOUNT".equalsIgnoreCase(context.getFilter())) {
             context.getExtras().put("menu_title", Language.INVENTORY_MOUNTS_MENU.getMessage());
         } else if ("PET".equalsIgnoreCase(context.getFilter())) {
             context.getExtras().put("menu_title", Language.INVENTORY_PETS_MENU.getMessage());
         }
 
-        final PaginatedGui gui = Gui.paginated()
-                .title(Utils.toComponent(MenuPlaceholders.apply(
-                        context.getExtras().getOrDefault("menu_title", def.getTitle()), context)))
-                .rows(resolveRows(def))
-                .disableAllInteractions()
-                .create();
-
+        final List<Category> owned = new ArrayList<>();
         for (final Category category : categories) {
             boolean owns = false;
             for (final Pet pet : category.getPets()) {
@@ -354,21 +529,37 @@ public class MenuService {
                     break;
                 }
             }
-            if (!owns) {
-                continue;
+            if (owns) {
+                owned.add(category);
             }
+        }
+
+        final List<Integer> contentSlots = resolvePagedContentSlots(def);
+        final int pageSize = Math.max(1, contentSlots.size());
+        final int totalPages = Math.max(1, (int) Math.ceil(owned.size() / (double) pageSize));
+        final int page = Math.min(Math.max(1, context.getPage()), totalPages);
+        context.setPage(page);
+
+        final Gui gui = Gui.gui()
+                .title(Utils.toComponent(MenuPlaceholders.apply(
+                        context.getExtras().getOrDefault("menu_title", def.getTitle()), context)))
+                .rows(resolveRows(def))
+                .disableAllInteractions()
+                .create();
+
+        final int start = (page - 1) * pageSize;
+        for (int i = 0; i < pageSize && start + i < owned.size(); i++) {
+            final Category category = owned.get(start + i);
+            final int slot = contentSlots.get(i);
             final ItemStack icon = category.getIcon().clone();
-            gui.addItem(ItemBuilder.from(icon).asGuiItem(e -> {
+            gui.setItem(slot, ItemBuilder.from(icon).asGuiItem(e -> {
                 e.setCancelled(true);
                 context.withCategory(category).withPage(1);
                 open("category", context);
             }));
         }
 
-        placeStaticItemsPaginated(gui, def, context, true, true);
-        for (int i = 1; i < context.getPage(); i++) {
-            if (!gui.next()) break;
-        }
+        placeStaticItems(gui, def, context, page > 1, page < totalPages);
         gui.open(player);
     }
 
@@ -388,16 +579,25 @@ public class MenuService {
             }
         }
 
-        final PaginatedGui gui = Gui.paginated()
+        final List<Integer> contentSlots = resolvePagedContentSlots(def);
+        final int pageSize = Math.max(1, contentSlots.size());
+        final int totalPages = Math.max(1, (int) Math.ceil(pets.size() / (double) pageSize));
+        final int page = Math.min(Math.max(1, context.getPage()), totalPages);
+        context.setPage(page);
+
+        final Gui gui = Gui.gui()
                 .title(Utils.toComponent(MenuPlaceholders.apply(
                         category.getDisplayName() != null ? category.getDisplayName() : def.getTitle(), context)))
                 .rows(resolveRows(def))
                 .disableAllInteractions()
                 .create();
 
-        for (final Pet pet : pets) {
+        final int start = (page - 1) * pageSize;
+        for (int i = 0; i < pageSize && start + i < pets.size(); i++) {
+            final Pet pet = pets.get(start + i);
+            final int slot = contentSlots.get(i);
             final ItemStack icon = pet.buildItem(pet.getIcon(), true);
-            gui.addItem(ItemBuilder.from(icon).asGuiItem(e -> {
+            gui.setItem(slot, ItemBuilder.from(icon).asGuiItem(e -> {
                 e.setCancelled(true);
                 Category.unregisterPlayerView(player);
                 player.closeInventory();
@@ -405,20 +605,40 @@ public class MenuService {
             }));
         }
 
-        // Outside-click back support via close + config
         gui.setDefaultClickAction(e -> e.setCancelled(true));
-        if (GlobalConfig.getInstance().isEnableClickBackToMenu()) {
-            gui.setCloseGuiAction(e -> {
-                // no-op — outside click handled via BACK item
-            });
-        }
-
-        placeStaticItemsPaginated(gui, def, context, true, true);
+        placeStaticItems(gui, def, context, page > 1, page < totalPages);
         Category.registerPlayerView(player, category);
-        for (int i = 1; i < context.getPage(); i++) {
-            if (!gui.next()) break;
-        }
         gui.open(player);
+    }
+
+    /**
+     * Content slots for paged menus, clipped to the resolved inventory size.
+     */
+    private List<Integer> resolvePagedContentSlots(final MenuDefinition def) {
+        final int size = resolveRows(def) * 9;
+        final List<Integer> raw = def.resolveContentSlots();
+        final List<Integer> slots = new ArrayList<>();
+        for (final Integer slot : raw) {
+            if (slot != null && slot >= 0 && slot < size) {
+                slots.add(slot);
+            }
+        }
+        if (!slots.isEmpty()) {
+            return slots;
+        }
+        // Absolute fallback: everything except known static item slots
+        final List<Integer> used = new ArrayList<>();
+        for (final MenuItemDefinition item : def.getItems()) {
+            if (item.getSlot() >= 0) {
+                used.add(item.getSlot());
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            if (!used.contains(i)) {
+                slots.add(i);
+            }
+        }
+        return slots;
     }
 
     private void openInteractionGui(final MenuDefinition def, final MenuContext context) {

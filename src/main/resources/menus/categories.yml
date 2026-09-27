@@ -1,6 +1,7 @@
 title: "%language_CATEGORY_MENU_TITLE%"
 type: PAGINATED
 rows: 6
+content-slots: 0-44
 items:
   previous:
     slot: 45

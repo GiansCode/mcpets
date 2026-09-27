@@ -100,13 +100,21 @@ public class EditorGlobalListener implements Listener {
 
             // If it's a pet icon, then we dive in the pet editing
             else if (editorItem.getType().equals(EditorExpectationType.PET)) {
-                final int slot = e.getSlot();
-                final Pet pet = Pet.getObjectPets().get(slot + 45 * EditorPageSelection.get(p));
+                final EditorEditing editing = EditorEditing.get(p);
+                String petId = editing.getEditorMapping().get(e.getSlot());
+                Pet pet = petId != null ? Pet.getFromId(petId) : null;
+                // Legacy fallback: consecutive slots before content-slots support
+                if (pet == null) {
+                    final int index = e.getSlot() + 45 * EditorPageSelection.get(p);
+                    final List<Pet> pets = Pet.getObjectPets();
+                    if (index >= 0 && index < pets.size()) {
+                        pet = pets.get(index);
+                    }
+                }
                 if (pet == null) {
                     Debugger.send("§cPet could not be found.");
                     return;
                 }
-                final EditorEditing editing = EditorEditing.get(p);
                 editing.setPetId(pet.getId());
                 editor.setState(EditorState.PET_EDITOR_EDIT);
                 editor.openEditor();

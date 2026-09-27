@@ -21,9 +21,10 @@ public class ArgumentEditor extends AArgument {
     @Override
     public void commandEffect() {
         final Player p = (Player) sender;
-        // Prefer YAML-driven global editor menu when available
-        if (MenuService.getInstance().get("global") != null) {
-            MenuService.getInstance().open("global", MenuContext.of(p));
+        final MenuService menus = MenuService.getInstance();
+        if (menus.resolve("editor-global", "global") != null) {
+            final String id = menus.get("editor-global") != null ? "editor-global" : "global";
+            menus.open(id, MenuContext.of(p));
         } else {
             fr.nocsy.mcpets.data.editor.Editor.getEditor(p).openEditor();
         }

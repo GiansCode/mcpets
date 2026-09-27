@@ -1,6 +1,15 @@
 title: "<gold>Edit pets</gold>"
 type: CHEST
 rows: 6
+# Where pet icons are placed. Edit THIS file on the server:
+#   plugins/MCPets/menus/editor/pets.yml
+# then run /mcpets reload
+#
+# Formats:
+#   content-slots: [10, 11, 12, 13, 14]
+#   content-slots: 10-16
+#   content-slots: "0-8,18-26"
+content-slots: 0-44
 items:
   back:
     slot: 45
@@ -11,10 +20,13 @@ items:
     slot: 49
     material: EMERALD
     name: "<green>Create pet</green>"
-    action: "EDITOR_NAVIGATE:PET_EDITOR"
+    action: NONE
   page:
     slot: 53
     material: PAPER
     name: "<aqua>Page</aqua>"
+    lore:
+      - "<gray>Left click: previous"
+      - "<gray>Right click: next"
     action: NEXT_PAGE
     pagination-next: true

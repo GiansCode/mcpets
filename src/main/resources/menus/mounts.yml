@@ -1,6 +1,7 @@
 title: "%language_INVENTORY_MOUNTS_MENU%"
 type: PAGINATED
 rows: 6
+content-slots: 0-44
 items:
   previous:
     slot: 45
