@@ -96,7 +96,12 @@ public enum Language {
     CATEGORY_MENU_TITLE("<black>☀ <dark_red>Pets <dark_gray>- Pick a category <black>☀"),
     CATEGORY_DOESNT_EXIST("<red>This category does not exist."),
 
-    PET_INVENTORY_TITLE("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_1("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_2("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_3("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_4("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_5("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
+    PET_INVENTORY_TITLE_6("<black>☀ <dark_red>%pet% <dark_gray>- <black>Inventory <black>☀"),
 
     PET_INVENTORY_COULDNOT_OPEN("<red>This inventory can not be opened as it may not exist."),
 
