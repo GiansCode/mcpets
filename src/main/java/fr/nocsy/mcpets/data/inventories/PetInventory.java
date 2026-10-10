@@ -41,9 +41,11 @@ public class PetInventory {
         this.pet = pet;
         this.pet.setOwner(owner);
 
-        String title = Language.PET_INVENTORY_TITLE.getMessageFormatted(new FormatArg("%pet%", pet.getIcon().getItemMeta().getDisplayName()));
+        int size = pet.getInventorySize();
+        // callers return early on size <= 0, so size / 9 is always 1..6
+        String title = Language.valueOf("PET_INVENTORY_TITLE_" + size / 9).getMessageFormatted(new FormatArg("%pet%", pet.getIcon().getItemMeta().getDisplayName()));
 
-        this.inventory = new PetInventoryHolder(pet.getInventorySize(), title, PetInventoryHolder.Type.PET_INVENTORY_MENU).getInventory();
+        this.inventory = new PetInventoryHolder(size, title, PetInventoryHolder.Type.PET_INVENTORY_MENU).getInventory();
         if (premadeInventory != null) {
             if (premadeInventory.getContents().length <= inventory.getContents().length)
                 inventory.setContents(premadeInventory.getContents());
